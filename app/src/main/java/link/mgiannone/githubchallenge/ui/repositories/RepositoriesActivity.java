@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import link.mgiannone.githubchallenge.R;
-import link.mgiannone.githubchallenge.data.Config;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.ui.base.BaseActivity;
 
@@ -35,7 +34,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	TextView notificationText;
 
 	private RepositoriesAdapter adapter;
-	private String owner = "facebook";
+	private String owner = "";
 
 	@Inject
 	RepositoriesPresenter presenter;
@@ -52,7 +51,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	private void initializePresenter() {
 		DaggerRepositoriesComponent.builder()
 				.repositoriesPresenterModule(new RepositoriesPresenterModule(this))
-				.gitHubChallengeRepositoryComponent(getPropertyRepositoryComponent())
+				.gitHubChallengeRepositoryComponent(getGitHubChallengeRepositoryComponent())
 				.build()
 				.inject(this);
 	}
@@ -83,6 +82,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override public boolean onQueryTextSubmit(String query) {
+				owner = query;
 				presenter.searchRepo(query);
 				return true;
 			}

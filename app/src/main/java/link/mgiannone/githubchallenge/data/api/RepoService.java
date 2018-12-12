@@ -9,7 +9,7 @@ import retrofit2.http.Path;
 
 public interface RepoService {
 
-	@GET("users/{username}/repos")
-	Flowable<RepoResponse> loadRepositories(@Path("username") String owner);
+	@GET("users/{username}/repos?per_page=100")
+	Flowable<List<Repo>> loadRepositories(@Path("username") String owner);
 
 }

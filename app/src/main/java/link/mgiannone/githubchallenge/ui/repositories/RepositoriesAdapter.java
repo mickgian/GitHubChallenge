@@ -21,9 +21,9 @@ import link.mgiannone.githubchallenge.R;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.ui.base.BaseRecyclerViewAdapter;
 
-class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.PropertyViewHolder> {
+class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.RepoViewHolder> {
 
-	class PropertyViewHolder extends RecyclerView.ViewHolder {
+	class RepoViewHolder extends RecyclerView.ViewHolder {
 		@BindView(R.id.repo_title_text_view)
 		TextView titleText;
 		@BindView(R.id.repo_code_text_view) TextView userText;
@@ -31,7 +31,7 @@ class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.Pr
 		@BindView(R.id.repo_image_profile)
 		ImageView profileImage;
 
-		public PropertyViewHolder(View view) {
+		public RepoViewHolder(View view) {
 			super(view);
 			ButterKnife.bind(this, view);
 		}
@@ -45,15 +45,15 @@ class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.Pr
 		this.context = context;
 	}
 
-	@Override public PropertyViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+	@Override public RepoViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 		View view = LayoutInflater.from(viewGroup.getContext())
 				.inflate(R.layout.item_repositories, viewGroup, false);
-		return new PropertyViewHolder(view);
+		return new RepoViewHolder(view);
 	}
 
 	@Override public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
 		super.onBindViewHolder(viewHolder, i);
-		PropertyViewHolder vh = (PropertyViewHolder) viewHolder; //safe cast
+		RepoViewHolder vh = (RepoViewHolder) viewHolder; //safe cast
 		Repo repo = properties.get(i);
 		vh.titleText.setText(repo.getName());
 		vh.userText.setText(repo.getUrl());

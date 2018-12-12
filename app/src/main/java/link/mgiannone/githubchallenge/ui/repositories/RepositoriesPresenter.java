@@ -84,7 +84,7 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	@Override public void searchRepo(final String owner) {
 
 		// Load new one and populate it into view
-		Disposable disposable = repository.loadRepos(false, owner)
+		Disposable disposable = repository.loadRepos(true, owner)
 				.flatMap(Flowable::fromIterable)
 				.filter(repo -> repo.getName() != null)
 				.filter(repo -> repo.getName().toLowerCase().contains(owner.toLowerCase()))
@@ -92,15 +92,15 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 				.toFlowable()
 				.subscribeOn(ioScheduler)
 				.observeOn(uiScheduler)
-				.subscribe(properties -> {
-					if (properties.isEmpty()) {
+				.subscribe(repos -> {
+					if (repos.isEmpty()) {
 						// Clear old data in view
 						view.clearRepos();
 						// Show notification
 						view.showEmptySearchResult();
 					} else {
 						// Update filtered data
-						view.showRepos(properties);
+						view.showRepos(repos);
 					}
 				});
 

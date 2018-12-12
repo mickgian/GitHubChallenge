@@ -37,7 +37,6 @@ public class RepoRepository implements RepoDataSource {
 			} else {
 				// else return data from local storage
 				return localDataSource.loadRepos(false, owner)
-						.take(1)
 						.flatMap(Flowable::fromIterable)
 						.doOnNext(repo -> caches.add(repo))
 						.toList()

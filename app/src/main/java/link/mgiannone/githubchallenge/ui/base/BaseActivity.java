@@ -28,7 +28,7 @@ import link.mgiannone.githubchallenge.ui.repositories.RepositoriesActivity;
 public class BaseActivity extends AppCompatActivity {
   private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
-  protected GitHubChallengeRepositoryComponent getPropertyRepositoryComponent() {
+  protected GitHubChallengeRepositoryComponent getGitHubChallengeRepositoryComponent() {
     return ((AndroidApplication) getApplication()).getGitHubChallengeRepositoryComponent();
   }
 

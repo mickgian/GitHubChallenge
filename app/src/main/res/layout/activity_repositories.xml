@@ -31,8 +31,10 @@
                 android:layout_marginLeft="40dp"
                 android:layout_weight="0.00"
                 android:background="@android:color/transparent"
+                android:padding="10dp"
                 android:text="@string/repos_by_user"
-                />
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="18sp"/>
 
         </LinearLayout>
 
