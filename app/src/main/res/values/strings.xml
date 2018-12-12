@@ -1,0 +1,23 @@
+<resources>
+  <string name="app_name">GitHubChallenge</string>
+
+  //General
+  <string name="edit">Edit</string>
+  <string name="cancel">Cancel</string>
+  <string name="add">Add</string>
+  <string name="yes">Yes</string>
+  <string name="no">No</string>
+  <string name="search">Search</string>
+  <string name="msg_no_data">No data returned. Pull to refresh.</string>
+  <string name="search_hint">Enter question title</string>
+
+  //Repos
+  <string name="repos_activity_title">Repositories</string>
+  <string name="repo_search_hint">Look for user</string>
+  <string name="msg_empty_repo_search_result">No repositories found for the current user.</string>
+  <string name="repos_by_user">Repositories for user:</string>
+
+  //Login
+  <string name="login_activity_title">Login</string>
+
+</resources>

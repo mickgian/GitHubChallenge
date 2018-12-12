@@ -1,0 +1,42 @@
+package link.mgiannone.githubchallenge;
+
+import android.app.Application;
+import com.facebook.stetho.Stetho;
+
+import com.squareup.leakcanary.LeakCanary;
+
+import link.mgiannone.githubchallenge.data.DaggerGitHubChallengeRepositoryComponent;
+import link.mgiannone.githubchallenge.data.GitHubChallengeRepositoryComponent;
+import timber.log.Timber;
+
+public class AndroidApplication extends Application {
+
+  private GitHubChallengeRepositoryComponent gitHubChallengeRepositoryComponent;
+
+  @Override
+  public void onCreate() {
+    super.onCreate();
+
+    initializeDependencies();
+
+    if (BuildConfig.DEBUG) {
+      Timber.plant(new Timber.DebugTree());
+      Stetho.initializeWithDefaults(this);
+    }
+
+    if (LeakCanary.isInAnalyzerProcess(this)) {
+      return;
+    }
+    LeakCanary.install(this);
+  }
+
+  private void initializeDependencies() {
+    gitHubChallengeRepositoryComponent = DaggerGitHubChallengeRepositoryComponent.builder()
+        .appModule(new AppModule(this))
+        .build();
+  }
+
+  public GitHubChallengeRepositoryComponent getGitHubChallengeRepositoryComponent() {
+    return gitHubChallengeRepositoryComponent;
+  }
+}
