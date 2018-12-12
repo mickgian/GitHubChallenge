@@ -7,7 +7,7 @@ import link.mgiannone.githubchallenge.data.model.Repo;
 
 public interface RepoDataSource {
 
-	Flowable<List<Repo>> loadRepos(boolean forceRemote);
+	Flowable<List<Repo>> loadRepos(boolean forceRemote, String owner);
 
 	void addRepo(Repo repo);
 

@@ -27,16 +27,16 @@ public class RepoRepository implements RepoDataSource {
 		caches = new ArrayList<>();
 	}
 
-	@Override public Flowable<List<Repo>> loadRepos(boolean forceRemote) {
+	@Override public Flowable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
 		if (forceRemote) {
-			return refreshData();
+			return refreshData(owner);
 		} else {
 			if (caches.size() > 0) {
 				// if cache is available, return it immediately
 				return Flowable.just(caches);
 			} else {
 				// else return data from local storage
-				return localDataSource.loadRepos(false)
+				return localDataSource.loadRepos(false, owner)
 						.take(1)
 						.flatMap(Flowable::fromIterable)
 						.doOnNext(repo -> caches.add(repo))
@@ -44,7 +44,7 @@ public class RepoRepository implements RepoDataSource {
 						.toFlowable()
 						.filter(list -> !list.isEmpty())
 						.switchIfEmpty(
-								refreshData()); // If local data is empty, fetch from remote source instead.
+								refreshData(owner)); // If local data is empty, fetch from remote source instead.
 			}
 		}
 	}
@@ -61,9 +61,9 @@ public class RepoRepository implements RepoDataSource {
 	 *
 	 * @return the Flowable of newly fetched data.
 	 */
-	Flowable<List<Repo>> refreshData() {
+	Flowable<List<Repo>> refreshData(String owner) {
 
-		return remoteDataSource.loadRepos(true).doOnNext(list -> {
+		return remoteDataSource.loadRepos(true, owner).doOnNext(list -> {
 			// Clear cache
 			caches.clear();
 			// Clear data in local storage

@@ -55,9 +55,9 @@ class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.Pr
 		super.onBindViewHolder(viewHolder, i);
 		PropertyViewHolder vh = (PropertyViewHolder) viewHolder; //safe cast
 		Repo repo = properties.get(i);
-		vh.titleText.setText(repo.getTitle());
-		vh.userText.setText(repo.getCode());
-		vh.createdTimeText.setText(repo.getSnippet());
+		vh.titleText.setText(repo.getName());
+		vh.userText.setText(repo.getUrl());
+		vh.createdTimeText.setText(repo.getDescription());
 		Glide.with(vh.profileImage)
 				.load(ResourcesCompat.getDrawable(context.getResources(), R.drawable.all_ita, null))
 				.into(vh.profileImage);

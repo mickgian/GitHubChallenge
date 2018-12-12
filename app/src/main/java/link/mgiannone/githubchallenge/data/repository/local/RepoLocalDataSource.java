@@ -19,7 +19,7 @@ public class RepoLocalDataSource implements RepoDataSource {
 	}
 
 	@Override
-	public Flowable<List<Repo>> loadRepos(boolean forceRemote) {
+	public Flowable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
 		return repoDao.getAllRepositories();
 	}
 

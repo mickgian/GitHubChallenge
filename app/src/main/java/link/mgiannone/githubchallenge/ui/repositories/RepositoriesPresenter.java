@@ -51,7 +51,7 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	}
 
 	@Override @OnLifecycleEvent(Lifecycle.Event.ON_RESUME) public void onAttach() {
-		loadRepos(false);
+		loadRepos(false, "");
 	}
 
 	@Override @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE) public void onDetach() {
@@ -59,12 +59,12 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 		disposeBag.clear();
 	}
 
-	@Override public void loadRepos(boolean onlineRequired) {
+	@Override public void loadRepos(boolean onlineRequired, String owner) {
 		// Clear old data on view
 		view.clearRepos();
 
 		// Load new one and populate it into view
-		Disposable disposable = repository.loadRepos(onlineRequired)
+		Disposable disposable = repository.loadRepos(onlineRequired, owner)
 				.subscribeOn(ioScheduler)
 				.observeOn(uiScheduler)
 				.subscribe(this::handleReturnedData, this::handleError, () -> view.stopLoadingIndicator());
@@ -81,13 +81,13 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 		disposeBag.add(disposable);
 	}
 
-	@Override public void searchRepo(final String repoTitle) {
+	@Override public void searchRepo(final String owner) {
 
 		// Load new one and populate it into view
-		Disposable disposable = repository.loadRepos(false)
+		Disposable disposable = repository.loadRepos(false, owner)
 				.flatMap(Flowable::fromIterable)
-				.filter(repo -> repo.getTitle() != null)
-				.filter(repo -> repo.getTitle().toLowerCase().contains(repoTitle.toLowerCase()))
+				.filter(repo -> repo.getName() != null)
+				.filter(repo -> repo.getName().toLowerCase().contains(owner.toLowerCase()))
 				.toList()
 				.toFlowable()
 				.subscribeOn(ioScheduler)

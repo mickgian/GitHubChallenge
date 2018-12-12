@@ -15,7 +15,6 @@ android {
     targetSdkVersion rootProject.targetSdkVersion
     versionCode versionMajor * 1000000 + versionMinor * 1000 + versionPatch * 100
     versionName "${versionMajor}.${versionMinor}.${versionPatch}"
-    flavorDimensions "default"
 
     //write out the schema to a schemas subfolder of project folder to track changes of schemas.
     javaCompileOptions {
@@ -44,14 +43,6 @@ android {
       signingConfig signingConfigs.release
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
-  }
-
-  productFlavors {
-    qa {
-      applicationId "link.mgiannone.githubchallenge.qa"
-      manifestPlaceholders = [appLabel: "QAEasyEstateArch", iconpath: "@mipmap/ic_launcher_qa"]
-      buildConfigField("String", "BASE_URL", "\"http://Easyestate-env-2.4hqdfcrhy7.eu-central-1.elasticbeanstalk.com\"")
     }
   }
 

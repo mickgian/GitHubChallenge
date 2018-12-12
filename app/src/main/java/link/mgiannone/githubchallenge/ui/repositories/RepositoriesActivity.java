@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import link.mgiannone.githubchallenge.R;
+import link.mgiannone.githubchallenge.data.Config;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.ui.base.BaseActivity;
 
@@ -34,6 +35,8 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	TextView notificationText;
 
 	private RepositoriesAdapter adapter;
+	private String owner = "facebook";
+
 	@Inject
 	RepositoriesPresenter presenter;
 
@@ -65,7 +68,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 				(view, position) -> presenter.getRepo(adapter.getItem(position).getId()));
 
 		// Refresh layout
-		refreshLayout.setOnRefreshListener(() -> presenter.loadRepos(true));
+		refreshLayout.setOnRefreshListener(() -> presenter.loadRepos(true, owner));
 		// Set notification text visible first
 		notificationText.setVisibility(View.GONE);
 	}
@@ -80,12 +83,12 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override public boolean onQueryTextSubmit(String query) {
-				return false;
+				presenter.searchRepo(query);
+				return true;
 			}
 
 			@Override public boolean onQueryTextChange(String newText) {
-				presenter.searchRepo(newText);
-				return true;
+				return false;
 			}
 		});
 

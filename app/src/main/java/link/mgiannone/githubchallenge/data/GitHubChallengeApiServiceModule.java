@@ -23,7 +23,7 @@ public class GitHubChallengeApiServiceModule {
 	@Provides
 	@Named(BASE_URL)
 	String provideBaseUrl() {
-		return BuildConfig.BASE_URL;
+		return Config.GITHUB_API_HOST;
 	}
 
 	@Provides
