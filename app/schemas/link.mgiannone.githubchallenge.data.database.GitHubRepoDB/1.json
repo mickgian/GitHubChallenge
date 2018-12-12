@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "39477dfd63a5c86b606337429c138550",
+    "identityHash": "919b9d196f479da6b66c05314b41688b",
     "entities": [
       {
         "tableName": "repo",
@@ -575,12 +575,44 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "branch",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `commit_sha` TEXT, `commit_url` TEXT, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "commit.sha",
+            "columnName": "commit_sha",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "commit.url",
+            "columnName": "commit_url",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"39477dfd63a5c86b606337429c138550\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"919b9d196f479da6b66c05314b41688b\")"
     ]
   }
 }

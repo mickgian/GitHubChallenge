@@ -7,40 +7,48 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import link.mgiannone.githubchallenge.data.model.Branch;
 import link.mgiannone.githubchallenge.data.model.Repo;
 
 public class RepoRepository implements RepoDataSource {
 
-	private RepoDataSource remoteDataSource;
-	private RepoDataSource localDataSource;
+	private RepoDataSource remoteRepoDataSource;
+	private RepoDataSource localRepoDataSource;
+	private BranchDataSource remoteBranchDataSource;
+	private BranchDataSource localBranchDataSource;
 
 	@VisibleForTesting
-	List<Repo> caches;
+	List<Repo> repoCaches;
+	List<Branch> branchCaches;
 
 	@Inject
-	public RepoRepository(@Local RepoDataSource localDataSource,
-						  @Remote RepoDataSource remoteDataSource) {
-		this.localDataSource = localDataSource;
-		this.remoteDataSource = remoteDataSource;
+	public RepoRepository(@Local RepoDataSource localRepoDataSource, @Local BranchDataSource localBranchDataSource,
+						  @Remote RepoDataSource remoteRepoDataSource, @Remote BranchDataSource remoteBranchDataSource) {
+		this.localRepoDataSource = localRepoDataSource;
+		this.remoteRepoDataSource = remoteRepoDataSource;
+		this.localBranchDataSource = localBranchDataSource;
+		this.remoteBranchDataSource = remoteBranchDataSource;
 
-		caches = new ArrayList<>();
+		repoCaches = new ArrayList<>();
+		branchCaches = new ArrayList<>();
 	}
 
-	@Override public Flowable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
+
+	@Override public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
 		if (forceRemote) {
 			return refreshData(owner);
 		} else {
-			if (caches.size() > 0) {
+			if (repoCaches.size() > 0) {
 				// if cache is available, return it immediately
-				return Flowable.just(caches);
+				return Observable.just(repoCaches);
 			} else {
 				// else return data from local storage
-				return localDataSource.loadRepos(false, owner)
-						.flatMap(Flowable::fromIterable)
-						.doOnNext(repo -> caches.add(repo))
+				return localRepoDataSource.loadRepos(false, owner)
+						.flatMap(Observable::fromIterable)
+						.doOnNext(repo -> repoCaches.add(repo))
 						.toList()
-						.toFlowable()
+						.toObservable()
 						.filter(list -> !list.isEmpty())
 						.switchIfEmpty(
 								refreshData(owner)); // If local data is empty, fetch from remote source instead.
@@ -58,19 +66,19 @@ public class RepoRepository implements RepoDataSource {
 	 * Fetches data from remote source.
 	 * Save it into both local database and cache.
 	 *
-	 * @return the Flowable of newly fetched data.
+	 * @return the Observable of newly fetched data.
 	 */
-	Flowable<List<Repo>> refreshData(String owner) {
+	Observable<List<Repo>> refreshData(String owner) {
 
-		return remoteDataSource.loadRepos(true, owner).doOnNext(list -> {
+		return remoteRepoDataSource.loadRepos(true, owner).doOnNext(list -> {
 			// Clear cache
-			caches.clear();
+			repoCaches.clear();
 			// Clear data in local storage
-			localDataSource.clearReposData();
-		}).flatMap(Flowable::fromIterable).doOnNext(repo -> {
-			caches.add(repo);
-			localDataSource.addRepo(repo);
-		}).toList().toFlowable();
+			localRepoDataSource.clearReposData();
+		}).flatMap(Observable::fromIterable).doOnNext(repo -> {
+			repoCaches.add(repo);
+			localRepoDataSource.addRepo(repo);
+		}).toList().toObservable();
 
 	}
 
@@ -80,15 +88,15 @@ public class RepoRepository implements RepoDataSource {
 	 * @param repoId Repo's id.
 	 * @return a corresponding Repo from cache.
 	 */
-	public Flowable<Repo> getRepo(int repoId) {
-		return Flowable.fromIterable(caches).filter(repo -> repo.getId() == repoId);
+	public Observable<Repo> getRepo(int repoId) {
+		return Observable.fromIterable(repoCaches).filter(repo -> repo.getId() == repoId);
 	}
 
 
 
 	@Override public void clearReposData() {
-		caches.clear();
-		localDataSource.clearReposData();
+		repoCaches.clear();
+		localRepoDataSource.clearReposData();
 	}
 }
 

@@ -5,7 +5,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import link.mgiannone.githubchallenge.BuildConfig;
+import link.mgiannone.githubchallenge.data.api.BranchService;
 import link.mgiannone.githubchallenge.data.api.HeaderInterceptor;
 import link.mgiannone.githubchallenge.data.api.RepoService;
 import okhttp3.OkHttpClient;
@@ -74,6 +74,12 @@ public class GitHubChallengeApiServiceModule {
 	@Singleton
 	RepoService provideRepositoryService(Retrofit retrofit) {
 		return retrofit.create(RepoService.class);
+	}
+
+	@Provides
+	@Singleton
+	BranchService provideBranchesService(Retrofit retrofit) {
+		return retrofit.create(BranchService.class);
 	}
 
 }

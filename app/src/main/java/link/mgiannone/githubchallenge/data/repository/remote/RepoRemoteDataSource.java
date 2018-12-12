@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import link.mgiannone.githubchallenge.data.api.RepoService;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.data.repository.RepoDataSource;
@@ -19,7 +19,7 @@ public class RepoRemoteDataSource implements RepoDataSource {
 	}
 
 	@Override
-	public Flowable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
+	public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
 		return repoService.loadRepositories(owner);
 	}
 

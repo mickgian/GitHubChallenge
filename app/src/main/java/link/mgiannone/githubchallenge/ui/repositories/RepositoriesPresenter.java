@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -85,11 +85,10 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 
 		// Load new one and populate it into view
 		Disposable disposable = repository.loadRepos(true, owner)
-				.flatMap(Flowable::fromIterable)
+				.flatMap(Observable::fromIterable)
 				.filter(repo -> repo.getName() != null)
-				.filter(repo -> repo.getName().toLowerCase().contains(owner.toLowerCase()))
 				.toList()
-				.toFlowable()
+				.toObservable()
 				.subscribeOn(ioScheduler)
 				.observeOn(uiScheduler)
 				.subscribe(repos -> {
