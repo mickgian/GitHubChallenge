@@ -8,7 +8,6 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import link.mgiannone.githubchallenge.data.database.BranchDao;
 import link.mgiannone.githubchallenge.data.database.GitHubRepoDB;
 import link.mgiannone.githubchallenge.data.database.RepoDao;
 
@@ -32,11 +31,5 @@ public class GitHubChallengeDatabaseModule {
 	@Singleton
 	RepoDao provideRepositoryDao(GitHubRepoDB gitHubRepoDB) {
 		return gitHubRepoDB.repoDao();
-	}
-
-	@Provides
-	@Singleton
-	BranchDao provideBranchDao(GitHubRepoDB gitHubRepoDB) {
-		return gitHubRepoDB.branchDao();
 	}
 }

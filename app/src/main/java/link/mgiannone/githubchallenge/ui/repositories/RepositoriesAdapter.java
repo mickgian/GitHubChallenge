@@ -1,15 +1,12 @@
 package link.mgiannone.githubchallenge.ui.repositories;
 
 import android.content.Context;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -25,11 +22,17 @@ class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.Re
 
 	class RepoViewHolder extends RecyclerView.ViewHolder {
 		@BindView(R.id.repo_title_text_view)
-		TextView titleText;
-		@BindView(R.id.repo_code_text_view) TextView userText;
-		@BindView(R.id.repo_address_text_view) TextView createdTimeText;
-		@BindView(R.id.repo_image_profile)
-		ImageView profileImage;
+		TextView repoTitleTextView;
+		@BindView(R.id.repo_stars_count_text_view)
+		TextView repoStarsCountTextView;
+		@BindView(R.id.repo_forks_count_text_view)
+		TextView repoForksCountTextView;
+		@BindView(R.id.repo_branches_count_text_view)
+		TextView repoBranchesCountTextView;
+		@BindView(R.id.repo_language_text_view)
+		TextView repoLanguageTextView;
+
+
 
 		public RepoViewHolder(View view) {
 			super(view);
@@ -37,11 +40,11 @@ class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.Re
 		}
 	}
 
-	private List<Repo> properties;
+	private List<Repo> repoList;
 	private Context context;
 
-	public RepositoriesAdapter(@NonNull List<Repo> properties, Context context) {
-		this.properties = properties;
+	public RepositoriesAdapter(@NonNull List<Repo> repoList, Context context) {
+		this.repoList = repoList;
 		this.context = context;
 	}
 
@@ -54,34 +57,33 @@ class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.Re
 	@Override public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
 		super.onBindViewHolder(viewHolder, i);
 		RepoViewHolder vh = (RepoViewHolder) viewHolder; //safe cast
-		Repo repo = properties.get(i);
-		vh.titleText.setText(repo.getName());
-		vh.userText.setText(repo.getUrl());
-		vh.createdTimeText.setText(repo.getDescription());
-		Glide.with(vh.profileImage)
-				.load(ResourcesCompat.getDrawable(context.getResources(), R.drawable.all_ita, null))
-				.into(vh.profileImage);
+		Repo repo = repoList.get(i);
+		vh.repoTitleTextView.setText(repo.getName());
+		vh.repoStarsCountTextView.setText(String.valueOf(repo.getStargazersCount()));
+		vh.repoForksCountTextView.setText(String.valueOf(repo.getForksCount()));
+		vh.repoBranchesCountTextView.setText(String.valueOf(repo.getBranchList().size()));
+		vh.repoLanguageTextView.setText(repo.getLanguage());
 	}
 
 	@Override public int getItemCount() {
-		return properties.size();
+		return repoList.size();
 	}
 
-	public void replaceData(List<Repo> properties) {
-		this.properties.clear();
-		this.properties.addAll(properties);
+	public void replaceData(List<Repo> repoList) {
+		this.repoList.clear();
+		this.repoList.addAll(repoList);
 		notifyDataSetChanged();
 	}
 
 	public Repo getItem(int position) {
-		if (position < 0 || position >= properties.size()) {
+		if (position < 0 || position >= repoList.size()) {
 			throw new InvalidParameterException("Invalid item index");
 		}
-		return properties.get(position);
+		return repoList.get(position);
 	}
 
 	public void clearData() {
-		properties.clear();
+		repoList.clear();
 		notifyDataSetChanged();
 	}
 }

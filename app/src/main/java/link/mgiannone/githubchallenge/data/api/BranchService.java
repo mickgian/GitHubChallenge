@@ -9,6 +9,6 @@ import retrofit2.http.Path;
 
 public interface BranchService {
 
-	@GET("{username}/{repo_name}/branches?per_page=100")
+	@GET("repos/{username}/{repo_name}/branches?per_page=10")
 	Observable<List<Branch>> loadBranches(@Path("username") String owner, @Path("repo_name") String repoName);
 }

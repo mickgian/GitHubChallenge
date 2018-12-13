@@ -2,19 +2,12 @@ package link.mgiannone.githubchallenge.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-import link.mgiannone.githubchallenge.data.Config;
-
-@Entity(tableName = Config.OWNER_TABLE_NAME)
 public class Owner {
 
 	@SerializedName("login")
 	private String login;
 
-	@SerializedName("id")
-	@PrimaryKey
-	private int id;
+	@SerializedName("id") private int id;
 
 	@SerializedName("node_id")
 	private String nodeId;

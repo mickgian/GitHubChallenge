@@ -16,6 +16,11 @@
   <string name="repo_search_hint">Look for user</string>
   <string name="msg_empty_repo_search_result">No repositories found for the current user.</string>
   <string name="repos_by_user">Repositories for user:</string>
+  <string name="repo_label_title">Repository name:</string>
+  <string name="repo_label_stars">Stars:</string>
+  <string name="repo_label_forks">Forks:</string>
+  <string name="repo_label_branches">Branches:</string>
+  <string name="repo_label_language">Language:</string>
 
   //Login
   <string name="login_activity_title">Login</string>

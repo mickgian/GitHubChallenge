@@ -99,12 +99,36 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 						view.showEmptySearchResult();
 					} else {
 						// Update filtered data
-						view.showRepos(repos);
+						view.searchBranches(repos);
 					}
 				});
 
 		disposeBag.add(disposable);
 
+	}
+
+	@Override
+	public void searchBranches(List<Repo> repositories) {
+
+		for(int i = 0; i < repositories.size(); i++){
+			int finalI = i;
+			Disposable disposable = repository.loadBranches(true, repositories.get(i).getOwner().getLogin(), repositories.get(i).getName())
+					.flatMap(Observable::fromIterable)
+					.filter(branch -> branch.getName() != null)
+					.toList()
+					.toObservable()
+					.subscribeOn(ioScheduler)
+					.observeOn(uiScheduler)
+					.subscribe(branches -> {
+
+							// Update repo obkect
+							repositories.get(finalI).setBranchList(branches);
+							view.showRepos(repositories);
+
+					});
+
+			disposeBag.add(disposable);
+		}
 	}
 
 	/**
