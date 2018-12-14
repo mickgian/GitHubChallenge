@@ -4,17 +4,20 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import link.mgiannone.githubchallenge.data.repository.AccessTokenDataSource;
 import link.mgiannone.githubchallenge.data.repository.BranchDataSource;
 import link.mgiannone.githubchallenge.data.repository.Local;
 import link.mgiannone.githubchallenge.data.repository.RepoDataSource;
 import link.mgiannone.githubchallenge.data.repository.Remote;
+import link.mgiannone.githubchallenge.data.repository.local.AccessTokenLocalDataSource;
 import link.mgiannone.githubchallenge.data.repository.local.BranchLocalDataSource;
 import link.mgiannone.githubchallenge.data.repository.local.RepoLocalDataSource;
+import link.mgiannone.githubchallenge.data.repository.remote.AccessTokenRemoteDataSource;
 import link.mgiannone.githubchallenge.data.repository.remote.BranchRemoteDataSource;
 import link.mgiannone.githubchallenge.data.repository.remote.RepoRemoteDataSource;
 
 @Module
-public class RepoRepositoryModule {
+public class GitHubChallengeRepositoryModule {
 
 	@Provides
 	@Local
@@ -44,4 +47,19 @@ public class RepoRepositoryModule {
 	public BranchDataSource provideRemoteBranchDataSource(BranchRemoteDataSource branchRemoteDataSource) {
 		return branchRemoteDataSource;
 	}
+
+	@Provides
+	@Local
+	@Singleton
+	public AccessTokenDataSource provideLocalAccessTokenDataSource(AccessTokenLocalDataSource accessTokenLocalDataSource) {
+		return accessTokenLocalDataSource;
+	}
+
+	@Provides
+	@Remote
+	@Singleton
+	public AccessTokenDataSource provideRemoteAccessTokenDataSource(AccessTokenRemoteDataSource accessTokenRemoteDataSource) {
+		return accessTokenRemoteDataSource;
+	}
+
 }

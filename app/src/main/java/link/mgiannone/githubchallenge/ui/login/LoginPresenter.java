@@ -1,18 +1,15 @@
 package link.mgiannone.githubchallenge.ui.login;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
-import io.reactivex.Flowable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import link.mgiannone.githubchallenge.BuildConfig;
+import link.mgiannone.githubchallenge.data.model.AccessToken;
+import link.mgiannone.githubchallenge.data.repository.GitHubChallengeRepository;
 import link.mgiannone.githubchallenge.util.schedulers.RunOn;
 
 import static link.mgiannone.githubchallenge.util.schedulers.SchedulerType.IO;
@@ -20,6 +17,7 @@ import static link.mgiannone.githubchallenge.util.schedulers.SchedulerType.UI;
 
 public class LoginPresenter implements LoginContract.Presenter, LifecycleObserver {
 
+	private GitHubChallengeRepository repository;
 
 	private LoginContract.View view;
 
@@ -29,8 +27,9 @@ public class LoginPresenter implements LoginContract.Presenter, LifecycleObserve
 	private CompositeDisposable disposeBag;
 
 	@Inject
-	public LoginPresenter(LoginContract.View view,
+	public LoginPresenter(GitHubChallengeRepository repository, LoginContract.View view,
 						  @RunOn(IO) Scheduler ioScheduler, @RunOn(UI) Scheduler uiScheduler) {
+		this.repository = repository;
 		this.view = view;
 		this.ioScheduler = ioScheduler;
 		this.uiScheduler = uiScheduler;
@@ -53,5 +52,24 @@ public class LoginPresenter implements LoginContract.Presenter, LifecycleObserve
 	}
 
 
+	@Override
+	public void sendSuccessMessageToView(String accessTokenString) {
+		view.showSuccessMessage(accessTokenString);
+	}
 
+	@Override
+	public void sendErrorMessageToView() {
+		view.showErrorMessage();
+	}
+
+	@Override
+	public void getAccessToken(String clientId, String clientSecret, String code) {
+		AccessToken accessToken = repository.recoverAccessToken(clientId, clientSecret, code);
+
+		if(accessToken == null){
+			sendErrorMessageToView();
+		}else{
+			sendSuccessMessageToView(accessToken.getAccesToken());
+		}
+	}
 }

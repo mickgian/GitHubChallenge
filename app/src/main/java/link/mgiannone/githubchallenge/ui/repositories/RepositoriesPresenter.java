@@ -14,7 +14,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import link.mgiannone.githubchallenge.data.model.Repo;
-import link.mgiannone.githubchallenge.data.repository.RepoRepository;
+import link.mgiannone.githubchallenge.data.repository.GitHubChallengeRepository;
 import link.mgiannone.githubchallenge.util.schedulers.RunOn;
 
 import static link.mgiannone.githubchallenge.util.schedulers.SchedulerType.IO;
@@ -25,7 +25,7 @@ import static link.mgiannone.githubchallenge.util.schedulers.SchedulerType.UI;
  */
 public class RepositoriesPresenter implements RepositoriesContract.Presenter, LifecycleObserver {
 
-	private RepoRepository repository;
+	private GitHubChallengeRepository repository;
 
 	private RepositoriesContract.View view;
 
@@ -35,7 +35,7 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	private CompositeDisposable disposeBag;
 
 	@Inject
-	public RepositoriesPresenter(RepoRepository repository, RepositoriesContract.View view,
+	public RepositoriesPresenter(GitHubChallengeRepository repository, RepositoriesContract.View view,
 								 @RunOn(IO) Scheduler ioScheduler, @RunOn(UI) Scheduler uiScheduler) {
 		this.repository = repository;
 		this.view = view;

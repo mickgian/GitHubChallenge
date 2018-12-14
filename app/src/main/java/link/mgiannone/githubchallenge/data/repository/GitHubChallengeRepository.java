@@ -1,33 +1,47 @@
 package link.mgiannone.githubchallenge.data.repository;
 
+import android.util.Log;
+
 import androidx.annotation.VisibleForTesting;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.model.Branch;
 import link.mgiannone.githubchallenge.data.model.Repo;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class RepoRepository implements RepoDataSource, BranchDataSource {
+public class GitHubChallengeRepository implements RepoDataSource, BranchDataSource, AccessTokenDataSource {
+
+	private static final String TAG = GitHubChallengeRepository.class.getSimpleName();
 
 	private RepoDataSource remoteRepoDataSource;
 	private RepoDataSource localRepoDataSource;
 	private BranchDataSource remoteBranchDataSource;
 
+	private AccessTokenDataSource remoteAccessTokenDataSource;
+
 	@VisibleForTesting
 	List<Repo> repoCaches;
 	List<Branch> branchCaches;
+	AccessToken accessToken;
 
 	@Inject
-	public RepoRepository(@Local RepoDataSource localRepoDataSource,
-						  @Remote RepoDataSource remoteRepoDataSource,
-						  @Remote BranchDataSource remoteBranchDataSource) {
+	public GitHubChallengeRepository(@Local RepoDataSource localRepoDataSource,
+									 @Remote RepoDataSource remoteRepoDataSource,
+									 @Remote BranchDataSource remoteBranchDataSource,
+									 @Remote AccessTokenDataSource remoteAccessTokenDataSource) {
 		this.localRepoDataSource = localRepoDataSource;
 		this.remoteRepoDataSource = remoteRepoDataSource;
 		this.remoteBranchDataSource = remoteBranchDataSource;
+		this.remoteAccessTokenDataSource = remoteAccessTokenDataSource;
 
 		repoCaches = new ArrayList<>();
 		branchCaches = new ArrayList<>();
@@ -80,8 +94,8 @@ public class RepoRepository implements RepoDataSource, BranchDataSource {
 			// Clear data in local storage
 			localRepoDataSource.clearReposData();
 		}).flatMap(Observable::fromIterable).doOnNext(repo -> {
-			repoCaches.add(repo);
-			localRepoDataSource.addRepo(repo);
+//			repoCaches.add(repo);
+//			localRepoDataSource.addRepo(repo);
 		}).toList().toObservable();
 
 	}
@@ -132,6 +146,37 @@ public class RepoRepository implements RepoDataSource, BranchDataSource {
 		}).flatMap(Observable::fromIterable).doOnNext(branch -> {
 			branchCaches.add(branch);
 		}).toList().toObservable();
+	}
+
+
+	public AccessToken recoverAccessToken(String clientId, String clientSecret, String code){
+
+		if(accessToken != null){
+			return accessToken;
+		}else{
+			Call<AccessToken> accessTokenCall = getToken(clientId, clientSecret,code);
+
+			accessTokenCall.enqueue(new Callback<AccessToken>() {
+			@Override
+			public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
+				Log.d(TAG, "Token Access succesfully recovered");
+				accessToken = response.body();
+			}
+
+			@Override
+			public void onFailure(Call<AccessToken> call, Throwable t) {
+				Log.d(TAG, "Error recovering Token Access");
+			}
+		});
+
+			return accessToken;
+		}
+	}
+
+	@Override
+	public Call<AccessToken> getToken(String clientId, String clientSecret, String code){
+		Call<AccessToken> accessTokenCall =  remoteAccessTokenDataSource.getToken(clientId, clientSecret, code);
+		return accessTokenCall;
 	}
 }
 

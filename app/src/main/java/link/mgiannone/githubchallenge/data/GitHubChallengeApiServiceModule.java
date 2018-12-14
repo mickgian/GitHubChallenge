@@ -5,6 +5,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import link.mgiannone.githubchallenge.data.api.AccessTokenService;
 import link.mgiannone.githubchallenge.data.api.BranchService;
 import link.mgiannone.githubchallenge.data.api.HeaderInterceptor;
 import link.mgiannone.githubchallenge.data.api.RepoService;
@@ -80,6 +81,12 @@ public class GitHubChallengeApiServiceModule {
 	@Singleton
 	BranchService provideBranchesService(Retrofit retrofit) {
 		return retrofit.create(BranchService.class);
+	}
+
+	@Provides
+	@Singleton
+	AccessTokenService provideAccessTokenService(Retrofit retrofit) {
+		return retrofit.create(AccessTokenService.class);
 	}
 
 }
