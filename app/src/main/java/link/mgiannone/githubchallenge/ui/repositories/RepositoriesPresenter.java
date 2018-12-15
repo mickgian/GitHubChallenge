@@ -125,26 +125,28 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 							String link = response.headers().get("Link");
 							if(link == null){ //Link value is not present into the header, it means there's only 1 branch, the master one.
 								repositories.get(finalI).setBranchesCount(1);
+								Log.d("RepositoriesPresenter", "Total branches for repository " + repositories.get(finalI).getName() + " is 1.");
+
 							}else {
-								Log.d("RepositoriesPresenter", "Header Link: " + link);
 
 								//get last page number: considering that we requested all the branches paginated with
 								//only 1 branch per page, the last page number is equal to the total number of branches
 								String totalBranchesString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
-								Log.d("RepositoriesPresenter", "Total branches: " + totalBranchesString);
+								Log.d("RepositoriesPresenter", "Total branches for repository " + repositories.get(finalI).getName() + " are " + totalBranchesString);
 
 								//set commits number into Repo object
 								repositories.get(finalI).setBranchesCount(Integer.valueOf(totalBranchesString));
 							}
 
+							if(finalI == repositories.size() -1){
+								view.countCommits(repositories);
+							}
 						}
 					});
 
 			disposeBag.add(disposable);
 
-			if(finalI == repositories.size() -1){
-				view.countCommits(repositories);
-			}
+
 		}
 	}
 
@@ -162,24 +164,24 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 
 							//getting value 'Link' from response headers
 							String link = response.headers().get("Link");
-							Log.d("RepositoriesPresenter", "Header Link: " + link);
 
 							//get last page number: considering that we requested all the commits paginated with
 							//only 1 commit per page, the last page number is equal to the total number of commits
 							String totalCommitsString = link.substring(link.lastIndexOf("&page=")+6, link.lastIndexOf(">"));
-							Log.d("RepositoriesPresenter", "Total commit: " + totalCommitsString);
+							Log.d("RepositoriesPresenter", "Total commits for repository " + repositories.get(finalI).getName() + " are " + totalCommitsString);
 
 							//set commits number into Repo object
 							repositories.get(finalI).setCommitsCount(Integer.valueOf(totalCommitsString));
 
+							if(finalI == repositories.size() -1){
+								view.showRepos(repositories);
+							}
 						}
 					});
 
 			disposeBag.add(disposable);
 
-			if(finalI == repositories.size() -1){
-				view.showRepos(repositories);
-			}
+
 		}
 
 
