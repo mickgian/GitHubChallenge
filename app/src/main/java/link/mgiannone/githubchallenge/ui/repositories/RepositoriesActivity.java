@@ -93,14 +93,6 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		return true;
 	}
 
-	@Override public void countBranches(List<Repo> repositories){
-		presenter.searchBranches(repositories);
-	}
-
-	@Override public void countCommits(List<Repo> repositories){
-		presenter.searchCommits(repositories);
-	}
-
 	@Override public void showRepos(List<Repo> repositories) {
 		notificationText.setVisibility(View.GONE);
 		adapter.replaceData(repositories);

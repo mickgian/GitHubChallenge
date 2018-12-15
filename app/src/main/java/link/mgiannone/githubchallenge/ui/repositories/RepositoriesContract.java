@@ -11,10 +11,6 @@ public interface RepositoriesContract {
 
 		void clearRepos();
 
-		void countBranches(List<Repo> repositories);
-
-		void countCommits(List<Repo> repositories);
-
 		void showNoDataMessage();
 
 		void showErrorMessage(String error);
@@ -32,9 +28,5 @@ public interface RepositoriesContract {
 		void getRepo(int repoId);
 
 		void searchRepo(String repoTitle);
-
-		void searchBranches(List<Repo> repositories);
-
-		void searchCommits(List<Repo> repositories);
 	}
 }
