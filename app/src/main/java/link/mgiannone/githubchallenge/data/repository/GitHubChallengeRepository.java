@@ -11,22 +11,27 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.model.Branch;
 import link.mgiannone.githubchallenge.data.model.Repo;
+import link.mgiannone.githubchallenge.data.repository.remote.CommitRemoteDataSource;
+import okhttp3.Headers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GitHubChallengeRepository implements RepoDataSource, BranchDataSource, AccessTokenDataSource {
+public class GitHubChallengeRepository implements RepoDataSource, BranchDataSource, AccessTokenDataSource, CommitDataSource {
 
 	private static final String TAG = GitHubChallengeRepository.class.getSimpleName();
 
 	private RepoDataSource remoteRepoDataSource;
 	private RepoDataSource localRepoDataSource;
-	private BranchDataSource remoteBranchDataSource;
 
+	private BranchDataSource remoteBranchDataSource;
 	private AccessTokenDataSource remoteAccessTokenDataSource;
+	private CommitDataSource remoteCommitDataSource;
+
 
 	@VisibleForTesting
 	List<Repo> repoCaches;
@@ -37,11 +42,13 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	public GitHubChallengeRepository(@Local RepoDataSource localRepoDataSource,
 									 @Remote RepoDataSource remoteRepoDataSource,
 									 @Remote BranchDataSource remoteBranchDataSource,
-									 @Remote AccessTokenDataSource remoteAccessTokenDataSource) {
+									 @Remote AccessTokenDataSource remoteAccessTokenDataSource,
+									 @Remote CommitDataSource remoteCommitDataSource) {
 		this.localRepoDataSource = localRepoDataSource;
 		this.remoteRepoDataSource = remoteRepoDataSource;
 		this.remoteBranchDataSource = remoteBranchDataSource;
 		this.remoteAccessTokenDataSource = remoteAccessTokenDataSource;
+		this.remoteCommitDataSource = remoteCommitDataSource;
 
 		repoCaches = new ArrayList<>();
 		branchCaches = new ArrayList<>();
@@ -99,6 +106,53 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 		}).toList().toObservable();
 
 	}
+
+//	Observable<List<Repo>> refreshData2(String owner) {
+//
+//		return remoteRepoDataSource.loadRepos(true, owner)
+//				.flatMap(Observable::fromIterable)
+//				.doOnNext(repo ->
+//						 remoteBranchDataSource.loadBranches(true, owner, repo.getName())
+//						 .flatMap(Observable::fromIterable)
+////						 .toList()
+////						 .subscribe(branches -> {
+////							repo.setBranchList(branches);
+////						 })
+//						.doOnNext(branch -> library.getAuthors().add(branch))
+//						.subscribe()
+//				).doOnNext(repo -> {
+//						remoteCommitDataSource.countCommits(true, owner, repo.getName())
+//								.subscribe(
+//										new Consumer<Response<List<Headers>>>() {
+//											@Override
+//											public void accept(Response<List<Headers>> response) throws Exception {
+//
+//												//getting value 'Link' from response headers
+//												String link = response.headers().get("Link");
+//												Log.d("RepositoriesPresenter", "Header Link: " + link);
+//
+//												//get last page number: considering that we requested all the commits paginated with
+//												//only 1 commit per page, the last page number is equal to the total number of commits
+//												String totalCommitsString = link.substring(link.lastIndexOf("&page=")+6, link.lastIndexOf(">"));
+//												Log.d("RepositoriesPresenter", "Total commit: " + totalCommitsString);
+//
+//												//set commits number into Repo object
+//												repo.setCommitsCount(Integer.valueOf(totalCommitsString));
+//
+//											}
+//										}
+//								);
+//				}).doOnNext(list -> {
+//					// Clear cache
+//					repoCaches.clear();
+//					// Clear data in local storage
+//					localRepoDataSource.clearReposData();
+//				}).flatMap(Observable::fromIterable).doOnNext(repo -> {
+////					repoCaches.add(repo);
+////					localRepoDataSource.addRepo(repo);
+//				}).toList().toObservable();
+//
+//	}
 
 	/**
 	 * Loads a repository by its repository id.
@@ -173,10 +227,23 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 		}
 	}
 
+	//////////////////
+	////  TOKEN  /////
+	//////////////////
+
 	@Override
 	public Call<AccessToken> getToken(String clientId, String clientSecret, String code){
 		Call<AccessToken> accessTokenCall =  remoteAccessTokenDataSource.getToken(clientId, clientSecret, code);
 		return accessTokenCall;
+	}
+
+	////////////////////
+	////  COMMITS  /////
+	////////////////////
+
+	@Override
+	public Observable<Response<List<Headers>>> countCommits(boolean forceRemote, String owner, String repoName) {
+		return remoteCommitDataSource.countCommits(forceRemote, owner, repoName);
 	}
 }
 

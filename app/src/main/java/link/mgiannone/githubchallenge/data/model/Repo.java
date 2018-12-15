@@ -46,6 +46,9 @@ public class Repo {
 	@SerializedName("watchers")
 	private int watchers;
 
+	@SerializedName("commits_count")
+	private int commitsCount;
+
 	@SerializedName("default_branch")
 	private String defaultBranch;
 
@@ -130,6 +133,14 @@ public class Repo {
 
 	public void setWatchers(int watchers) {
 		this.watchers = watchers;
+	}
+
+	public int getCommitsCount() {
+		return commitsCount;
+	}
+
+	public void setCommitsCount(int commitsCount) {
+		this.commitsCount = commitsCount;
 	}
 
 	public String getDefaultBranch() {

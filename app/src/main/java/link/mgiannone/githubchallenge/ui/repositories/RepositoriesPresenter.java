@@ -1,5 +1,7 @@
 package link.mgiannone.githubchallenge.ui.repositories;
 
+import android.util.Log;
+
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -13,9 +15,12 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.data.repository.GitHubChallengeRepository;
 import link.mgiannone.githubchallenge.util.schedulers.RunOn;
+import okhttp3.Headers;
+import retrofit2.Response;
 
 import static link.mgiannone.githubchallenge.util.schedulers.SchedulerType.IO;
 import static link.mgiannone.githubchallenge.util.schedulers.SchedulerType.UI;
@@ -99,7 +104,7 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 						view.showEmptySearchResult();
 					} else {
 						// Update filtered data
-						view.searchBranches(repos);
+						view.countBranches(repos);
 					}
 				});
 
@@ -121,14 +126,53 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 					.observeOn(uiScheduler)
 					.subscribe(branches -> {
 
-							// Update repo obkect
+							// Update repo object
 							repositories.get(finalI).setBranchList(branches);
-							view.showRepos(repositories);
-
 					});
 
 			disposeBag.add(disposable);
+
+			if(finalI == repositories.size() -1){
+				view.countCommits(repositories);
+			}
 		}
+	}
+
+	@Override
+	public void searchCommits(List<Repo> repositories) {
+
+		for(int i = 0; i < repositories.size(); i++){
+			int finalI = i;
+			Disposable disposable = repository.countCommits(true, repositories.get(i).getOwner().getLogin(), repositories.get(i).getName())
+					.subscribeOn(ioScheduler)
+					.observeOn(uiScheduler)
+					.subscribe(new Consumer<Response<List<Headers>>>() {
+						@Override
+						public void accept(Response<List<Headers>> response) throws Exception {
+
+							//getting value 'Link' from response headers
+							String link = response.headers().get("Link");
+							Log.d("RepositoriesPresenter", "Header Link: " + link);
+
+							//get last page number: considering that we requested all the commits paginated with
+							//only 1 commit per page, the last page number is equal to the total number of commits
+							String totalCommitsString = link.substring(link.lastIndexOf("&page=")+6, link.lastIndexOf(">"));
+							Log.d("RepositoriesPresenter", "Total commit: " + totalCommitsString);
+
+							//set commits number into Repo object
+							repositories.get(finalI).setCommitsCount(Integer.valueOf(totalCommitsString));
+
+						}
+					});
+
+			disposeBag.add(disposable);
+
+			if(finalI == repositories.size() -1){
+				view.showRepos(repositories);
+			}
+		}
+
+
 	}
 
 	/**

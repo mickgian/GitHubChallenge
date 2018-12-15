@@ -7,6 +7,7 @@ import dagger.Module;
 import dagger.Provides;
 import link.mgiannone.githubchallenge.data.api.AccessTokenService;
 import link.mgiannone.githubchallenge.data.api.BranchService;
+import link.mgiannone.githubchallenge.data.api.CommitService;
 import link.mgiannone.githubchallenge.data.api.HeaderInterceptor;
 import link.mgiannone.githubchallenge.data.api.RepoService;
 import okhttp3.OkHttpClient;
@@ -87,6 +88,12 @@ public class GitHubChallengeApiServiceModule {
 	@Singleton
 	AccessTokenService provideAccessTokenService(Retrofit retrofit) {
 		return retrofit.create(AccessTokenService.class);
+	}
+
+	@Provides
+	@Singleton
+	CommitService provideCommitService(Retrofit retrofit) {
+		return retrofit.create((CommitService.class));
 	}
 
 }

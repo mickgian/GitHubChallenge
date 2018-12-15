@@ -21,17 +21,22 @@ import link.mgiannone.githubchallenge.ui.base.BaseRecyclerViewAdapter;
 class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.RepoViewHolder> {
 
 	class RepoViewHolder extends RecyclerView.ViewHolder {
+
 		@BindView(R.id.repo_title_text_view)
 		TextView repoTitleTextView;
+		@BindView(R.id.repo_language_text_view)
+		TextView repoLanguageTextView;
+		@BindView(R.id.repo_description_text_view)
+		TextView repoDescriptionTextView;
+
 		@BindView(R.id.repo_stars_count_text_view)
 		TextView repoStarsCountTextView;
 		@BindView(R.id.repo_forks_count_text_view)
 		TextView repoForksCountTextView;
 		@BindView(R.id.repo_branches_count_text_view)
 		TextView repoBranchesCountTextView;
-		@BindView(R.id.repo_language_text_view)
-		TextView repoLanguageTextView;
-
+		@BindView(R.id.repo_commits_count_text_view)
+		TextView repoCommitsCountTextView;
 
 
 		public RepoViewHolder(View view) {
@@ -58,11 +63,15 @@ class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.Re
 		super.onBindViewHolder(viewHolder, i);
 		RepoViewHolder vh = (RepoViewHolder) viewHolder; //safe cast
 		Repo repo = repoList.get(i);
+
 		vh.repoTitleTextView.setText(repo.getName());
+		vh.repoLanguageTextView.setText(repo.getLanguage());
+		vh.repoDescriptionTextView.setText(repo.getDescription());
+
 		vh.repoStarsCountTextView.setText(String.valueOf(repo.getStargazersCount()));
 		vh.repoForksCountTextView.setText(String.valueOf(repo.getForksCount()));
 		vh.repoBranchesCountTextView.setText(String.valueOf(repo.getBranchList().size()));
-		vh.repoLanguageTextView.setText(repo.getLanguage());
+		vh.repoCommitsCountTextView.setText(String.valueOf(repo.getCommitsCount()));
 	}
 
 	@Override public int getItemCount() {
