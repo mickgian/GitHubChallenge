@@ -1,21 +1,14 @@
 package link.mgiannone.githubchallenge.data.repository;
 
 import android.util.Log;
-
 import androidx.annotation.VisibleForTesting;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.inject.Inject;
-
 import io.reactivex.Observable;
-import io.reactivex.functions.Consumer;
 import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.model.Branch;
 import link.mgiannone.githubchallenge.data.model.Repo;
-import link.mgiannone.githubchallenge.data.repository.remote.CommitRemoteDataSource;
 import okhttp3.Headers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -112,7 +105,7 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 //		return remoteRepoDataSource.loadRepos(true, owner)
 //				.flatMap(Observable::fromIterable)
 //				.doOnNext(repo ->
-//						 remoteBranchDataSource.loadBranches(true, owner, repo.getName())
+//						 remoteBranchDataSource.countBranches(true, owner, repo.getName())
 //						 .flatMap(Observable::fromIterable)
 ////						 .toList()
 ////						 .subscribe(branches -> {
@@ -176,32 +169,10 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	////  BRANCHES  /////
 	/////////////////////
 
-	@Override public Observable<List<Branch>> loadBranches(boolean forceRemote, String owner, String repoName) {
-			return refreshBranchData(owner, repoName);
-	}
-
 	@Override
-	public void addBranch(Branch branch) {
-		//Currently, we do not need this.
-		throw new UnsupportedOperationException("Unsupported operation");
+	public Observable<Response<List<Headers>>> countBranches(boolean forceRemote, String owner, String repoName) {
+		return remoteBranchDataSource.countBranches(true, owner, repoName);
 	}
-
-	@Override
-	public void clearBranchesData() {
-		branchCaches.clear();
-	}
-
-	Observable<List<Branch>> refreshBranchData(String owner, String repoName) {
-
-		return remoteBranchDataSource.loadBranches(true, owner, repoName).doOnNext(list -> {
-			// Clear cache
-			branchCaches.clear();
-			// Clear data in local storage
-		}).flatMap(Observable::fromIterable).doOnNext(branch -> {
-			branchCaches.add(branch);
-		}).toList().toObservable();
-	}
-
 
 	public AccessToken recoverAccessToken(String clientId, String clientSecret, String code){
 

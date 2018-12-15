@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3e6c04e9aa827dcc39f4fae3d2f82e83",
+    "identityHash": "d4704715f9a2c7c5f940a2b3d3419974",
     "entities": [
       {
         "tableName": "repo",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT, `description` TEXT, `url` TEXT, `stargazersCount` INTEGER NOT NULL, `watchersCount` INTEGER NOT NULL, `language` TEXT, `forksCount` INTEGER NOT NULL, `watchers` INTEGER NOT NULL, `commitsCount` INTEGER NOT NULL, `defaultBranch` TEXT, `owner_login` TEXT, `owner_id` INTEGER, `owner_nodeId` TEXT, `owner_avatarUrl` TEXT, `owner_gravatarId` TEXT, `owner_url` TEXT, `owner_htmlUrl` TEXT, `owner_followersUrl` TEXT, `owner_followingUrl` TEXT, `owner_gistsUrl` TEXT, `owner_starredUrl` TEXT, `owner_subscriptionsUrl` TEXT, `owner_organizationsUrl` TEXT, `owner_reposUrl` TEXT, `owner_eventsUrl` TEXT, `owner_receivedEventsUrl` TEXT, `owner_type` TEXT, `owner_siteAdmin` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT, `description` TEXT, `url` TEXT, `stargazersCount` INTEGER NOT NULL, `watchersCount` INTEGER NOT NULL, `language` TEXT, `forksCount` INTEGER NOT NULL, `watchers` INTEGER NOT NULL, `branchesCount` INTEGER NOT NULL, `commitsCount` INTEGER NOT NULL, `defaultBranch` TEXT, `owner_login` TEXT, `owner_id` INTEGER, `owner_nodeId` TEXT, `owner_avatarUrl` TEXT, `owner_gravatarId` TEXT, `owner_url` TEXT, `owner_htmlUrl` TEXT, `owner_followersUrl` TEXT, `owner_followingUrl` TEXT, `owner_gistsUrl` TEXT, `owner_starredUrl` TEXT, `owner_subscriptionsUrl` TEXT, `owner_organizationsUrl` TEXT, `owner_reposUrl` TEXT, `owner_eventsUrl` TEXT, `owner_receivedEventsUrl` TEXT, `owner_type` TEXT, `owner_siteAdmin` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -59,6 +59,12 @@
           {
             "fieldPath": "watchers",
             "columnName": "watchers",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "branchesCount",
+            "columnName": "branchesCount",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -196,7 +202,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"3e6c04e9aa827dcc39f4fae3d2f82e83\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d4704715f9a2c7c5f940a2b3d3419974\")"
     ]
   }
 }

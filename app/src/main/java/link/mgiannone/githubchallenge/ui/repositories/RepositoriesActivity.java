@@ -1,23 +1,18 @@
 package link.mgiannone.githubchallenge.ui.repositories;
 
 import android.os.Bundle;
-
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
-
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import link.mgiannone.githubchallenge.R;
@@ -30,6 +25,8 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	RecyclerView repoRecyclerView;
 	@BindView(R.id.refreshRepos)
 	SwipeRefreshLayout refreshLayout;
+	@BindView(R.id.repo_owner_text_view)
+	TextView repoOwnerTextView;
 	@BindView(R.id.repo_text_notification)
 	TextView notificationText;
 
@@ -84,6 +81,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 			@Override public boolean onQueryTextSubmit(String query) {
 				owner = query;
 				presenter.searchRepo(query);
+				repoOwnerTextView.setText(query);
 				return true;
 			}
 

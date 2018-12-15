@@ -1,12 +1,8 @@
 package link.mgiannone.githubchallenge.data.model;
 
 import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
-
 import androidx.room.Embedded;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import link.mgiannone.githubchallenge.data.Config;
 
@@ -46,14 +42,15 @@ public class Repo {
 	@SerializedName("watchers")
 	private int watchers;
 
+	@SerializedName("branches_count")
+	private int branchesCount;
+
 	@SerializedName("commits_count")
 	private int commitsCount;
 
 	@SerializedName("default_branch")
 	private String defaultBranch;
 
-	@Ignore
-	private List<Branch> branchList;
 
 	public int getId() {
 		return id;
@@ -143,6 +140,14 @@ public class Repo {
 		this.commitsCount = commitsCount;
 	}
 
+	public int getBranchesCount() {
+		return branchesCount;
+	}
+
+	public void setBranchesCount(int branchesCount) {
+		this.branchesCount = branchesCount;
+	}
+
 	public String getDefaultBranch() {
 		return defaultBranch;
 	}
@@ -151,12 +156,5 @@ public class Repo {
 		this.defaultBranch = defaultBranch;
 	}
 
-	public List<Branch> getBranchList() {
-		return branchList;
-	}
-
-	public void setBranchList(List<Branch> branchList) {
-		this.branchList = branchList;
-	}
 }
 

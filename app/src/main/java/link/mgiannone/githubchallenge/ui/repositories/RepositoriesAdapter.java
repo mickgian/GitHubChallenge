@@ -70,7 +70,7 @@ class RepositoriesAdapter extends BaseRecyclerViewAdapter<RepositoriesAdapter.Re
 
 		vh.repoStarsCountTextView.setText(String.valueOf(repo.getStargazersCount()));
 		vh.repoForksCountTextView.setText(String.valueOf(repo.getForksCount()));
-		vh.repoBranchesCountTextView.setText(String.valueOf(repo.getBranchList().size()));
+		vh.repoBranchesCountTextView.setText(String.valueOf(repo.getBranchesCount()));
 		vh.repoCommitsCountTextView.setText(String.valueOf(repo.getCommitsCount()));
 	}
 

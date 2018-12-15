@@ -1,15 +1,12 @@
 package link.mgiannone.githubchallenge.data.repository;
 
 import java.util.List;
-
 import io.reactivex.Observable;
-import link.mgiannone.githubchallenge.data.model.Branch;
+import okhttp3.Headers;
+import retrofit2.Response;
 
 public interface BranchDataSource {
 
-	Observable<List<Branch>> loadBranches(boolean forceRemote, String owner, String repoName);
+	Observable<Response<List<Headers>>> countBranches(boolean forceRemote, String owner, String repoName);
 
-	void addBranch(Branch branch);
-
-	void clearBranchesData();
 }

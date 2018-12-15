@@ -6,11 +6,8 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
-
 import java.util.List;
-
 import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
@@ -117,17 +114,30 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 
 		for(int i = 0; i < repositories.size(); i++){
 			int finalI = i;
-			Disposable disposable = repository.loadBranches(true, repositories.get(i).getOwner().getLogin(), repositories.get(i).getName())
-					.flatMap(Observable::fromIterable)
-					.filter(branch -> branch.getName() != null)
-					.toList()
-					.toObservable()
+			Disposable disposable = repository.countBranches(true, repositories.get(i).getOwner().getLogin(), repositories.get(i).getName())
 					.subscribeOn(ioScheduler)
 					.observeOn(uiScheduler)
-					.subscribe(branches -> {
+					.subscribe(new Consumer<Response<List<Headers>>>() {
+						@Override
+						public void accept(Response<List<Headers>> response) throws Exception {
 
-							// Update repo object
-							repositories.get(finalI).setBranchList(branches);
+							//getting value 'Link' from response headers
+							String link = response.headers().get("Link");
+							if(link == null){ //Link value is not present into the header, it means there's only 1 branch, the master one.
+								repositories.get(finalI).setBranchesCount(1);
+							}else {
+								Log.d("RepositoriesPresenter", "Header Link: " + link);
+
+								//get last page number: considering that we requested all the branches paginated with
+								//only 1 branch per page, the last page number is equal to the total number of branches
+								String totalBranchesString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
+								Log.d("RepositoriesPresenter", "Total branches: " + totalBranchesString);
+
+								//set commits number into Repo object
+								repositories.get(finalI).setBranchesCount(Integer.valueOf(totalBranchesString));
+							}
+
+						}
 					});
 
 			disposeBag.add(disposable);
