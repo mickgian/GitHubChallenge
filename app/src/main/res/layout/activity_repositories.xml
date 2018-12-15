@@ -40,7 +40,7 @@
                 android:id="@+id/repo_owner_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
+                android:layout_marginLeft="20dp"
                 android:layout_weight="0.00"
                 android:background="@android:color/transparent"
                 android:padding="10dp"

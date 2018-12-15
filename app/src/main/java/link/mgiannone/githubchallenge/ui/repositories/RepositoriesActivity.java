@@ -30,6 +30,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	@BindView(R.id.repo_text_notification)
 	TextView notificationText;
 
+	private SearchView searchView;
 	private RepositoriesAdapter adapter;
 	private String owner = "";
 
@@ -43,6 +44,11 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		ButterKnife.bind(this);
 		initializePresenter();
 		setupWidgets();
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		repoOwnerTextView.setText(savedInstanceState.getString("owner"));
 	}
 
 	private void initializePresenter() {
@@ -73,7 +79,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		getMenuInflater().inflate(R.menu.repositories, menu);
 
 		// Setup search widget in action bar
-		SearchView searchView = (SearchView) menu.findItem(R.id.repos_action_search).getActionView();
+		searchView = (SearchView) menu.findItem(R.id.repos_action_search).getActionView();
 		searchView.setQueryHint(getString(R.string.repo_search_hint));
 		searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -129,6 +135,15 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	private void showNotification(String message) {
 		notificationText.setVisibility(View.VISIBLE);
 		notificationText.setText(message);
+	}
+
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putString("owner", repoOwnerTextView.getText().toString());
+
+		// call superclass to save any view hierarchy
+		super.onSaveInstanceState(outState);
 	}
 }
 

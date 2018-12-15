@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase;
 
 import link.mgiannone.githubchallenge.data.model.Repo;
 
-@Database(entities = {Repo.class} , version = 1)
+@Database(entities = Repo.class, version = 1)
 public abstract class GitHubRepoDB extends RoomDatabase {
 
 	public abstract RepoDao repoDao();

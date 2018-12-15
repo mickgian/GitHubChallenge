@@ -25,7 +25,7 @@ public class RepoLocalDataSource implements RepoDataSource {
 
 	@Override
 	public void addRepo(Repo repo) {
-
+		repoDao.insert(repo);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package link.mgiannone.githubchallenge.data.repository;
 
+import android.os.AsyncTask;
 import android.util.Log;
 import androidx.annotation.VisibleForTesting;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 
 	@Override public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
 		if (forceRemote) {
-			return refreshData(owner);
+			return refreshData(forceRemote, owner);
 		} else {
 			if (repoCaches.size() > 0) {
 				// if cache is available, return it immediately
@@ -61,13 +62,14 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 			} else {
 				// else return data from local storage
 				return localRepoDataSource.loadRepos(false, owner)
+						.take(1)
 						.flatMap(Observable::fromIterable)
 						.doOnNext(repo -> repoCaches.add(repo))
 						.toList()
 						.toObservable()
 						.filter(list -> !list.isEmpty())
 						.switchIfEmpty(
-								refreshData(owner)); // If local data is empty, fetch from remote source instead.
+								refreshData(forceRemote, owner)); // If local data is empty, fetch from remote source instead.
 			}
 		}
 	}
@@ -84,7 +86,11 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	 *
 	 * @return the Observable of newly fetched data.
 	 */
-	Observable<List<Repo>> refreshData(String owner) {
+	Observable<List<Repo>> refreshData(boolean forceRemote, String owner) {
+
+		if(forceRemote) {
+			clearCacheAndLocalDB();
+		}
 
 		return remoteRepoDataSource.loadRepos(true, owner)
 				.flatMap(Observable::fromIterable)
@@ -134,16 +140,18 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 											}
 										}
 								);
-				}).doOnNext(list -> {
-					// Clear cache
-					repoCaches.clear();
-					// Clear data in local storage
-					localRepoDataSource.clearReposData();
-				}).doOnNext(repo -> {
+				}).flatMap(Observable::fromArray).doOnNext(repo -> {
 					repoCaches.add(repo);
 					localRepoDataSource.addRepo(repo);
 				}).toList().toObservable();
 
+	}
+
+	private void clearCacheAndLocalDB() {
+		// Clear cache
+		repoCaches.clear();
+		// Clear data in local storage
+		new deleteAllReposAsyncTask(localRepoDataSource).execute();
 	}
 
 	/**
@@ -173,28 +181,13 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 		return remoteBranchDataSource.countBranches(true, owner, repoName);
 	}
 
-	public AccessToken recoverAccessToken(String clientId, String clientSecret, String code){
+	////////////////////
+	////  COMMITS  /////
+	////////////////////
 
-		if(accessToken != null){
-			return accessToken;
-		}else{
-			Call<AccessToken> accessTokenCall = getToken(clientId, clientSecret,code);
-
-			accessTokenCall.enqueue(new Callback<AccessToken>() {
-			@Override
-			public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
-				Log.d(TAG, "Token Access succesfully recovered");
-				accessToken = response.body();
-			}
-
-			@Override
-			public void onFailure(Call<AccessToken> call, Throwable t) {
-				Log.d(TAG, "Error recovering Token Access");
-			}
-		});
-
-			return accessToken;
-		}
+	@Override
+	public Observable<Response<List<Headers>>> countCommits(boolean forceRemote, String owner, String repoName) {
+		return remoteCommitDataSource.countCommits(forceRemote, owner, repoName);
 	}
 
 	//////////////////
@@ -207,13 +200,42 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 		return accessTokenCall;
 	}
 
-	////////////////////
-	////  COMMITS  /////
-	////////////////////
+	public AccessToken recoverAccessToken(String clientId, String clientSecret, String code){
 
-	@Override
-	public Observable<Response<List<Headers>>> countCommits(boolean forceRemote, String owner, String repoName) {
-		return remoteCommitDataSource.countCommits(forceRemote, owner, repoName);
+		if(accessToken != null){
+			return accessToken;
+		}else{
+			Call<AccessToken> accessTokenCall = getToken(clientId, clientSecret,code);
+
+			accessTokenCall.enqueue(new Callback<AccessToken>() {
+				@Override
+				public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
+					Log.d(TAG, "Token Access succesfully recovered");
+					accessToken = response.body();
+				}
+
+				@Override
+				public void onFailure(Call<AccessToken> call, Throwable t) {
+					Log.d(TAG, "Error recovering Token Access");
+				}
+			});
+
+			return accessToken;
+		}
+	}
+
+	private static class deleteAllReposAsyncTask extends AsyncTask<Void, Void, Void> {
+		private RepoDataSource asyncTaskLocalRepoDataSource;
+
+		deleteAllReposAsyncTask(RepoDataSource localRepoDataSource) {
+			asyncTaskLocalRepoDataSource = localRepoDataSource;
+		}
+
+		@Override
+		protected Void doInBackground(Void... voids) {
+			asyncTaskLocalRepoDataSource.clearReposData();
+			return null;
+		}
 	}
 }
 
