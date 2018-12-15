@@ -11,7 +11,6 @@ import link.mgiannone.githubchallenge.data.repository.Local;
 import link.mgiannone.githubchallenge.data.repository.RepoDataSource;
 import link.mgiannone.githubchallenge.data.repository.Remote;
 import link.mgiannone.githubchallenge.data.repository.local.AccessTokenLocalDataSource;
-import link.mgiannone.githubchallenge.data.repository.local.BranchLocalDataSource;
 import link.mgiannone.githubchallenge.data.repository.local.RepoLocalDataSource;
 import link.mgiannone.githubchallenge.data.repository.remote.AccessTokenRemoteDataSource;
 import link.mgiannone.githubchallenge.data.repository.remote.BranchRemoteDataSource;
@@ -35,19 +34,18 @@ public class GitHubChallengeRepositoryModule {
 		return repoRemoteDataSource;
 	}
 
-
-	@Provides
-	@Local
-	@Singleton
-	public BranchDataSource provideLocalBranchDataSource(BranchLocalDataSource branchLocalDataSource) {
-		return branchLocalDataSource;
-	}
-
 	@Provides
 	@Remote
 	@Singleton
 	public BranchDataSource provideRemoteBranchDataSource(BranchRemoteDataSource branchRemoteDataSource) {
 		return branchRemoteDataSource;
+	}
+
+	@Provides
+	@Remote
+	@Singleton
+	public CommitDataSource provideRemoteCommitDataSource(CommitRemoteDataSource commitRemoteDataSource) {
+		return commitRemoteDataSource;
 	}
 
 	@Provides
@@ -62,13 +60,6 @@ public class GitHubChallengeRepositoryModule {
 	@Singleton
 	public AccessTokenDataSource provideRemoteAccessTokenDataSource(AccessTokenRemoteDataSource accessTokenRemoteDataSource) {
 		return accessTokenRemoteDataSource;
-	}
-
-	@Provides
-	@Remote
-	@Singleton
-	public CommitDataSource provideRemoteCommitDataSource(CommitRemoteDataSource commitRemoteDataSource) {
-		return commitRemoteDataSource;
 	}
 
 }

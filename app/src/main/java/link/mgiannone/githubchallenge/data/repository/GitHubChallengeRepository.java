@@ -34,8 +34,8 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	public GitHubChallengeRepository(@Local RepoDataSource localRepoDataSource,
 									 @Remote RepoDataSource remoteRepoDataSource,
 									 @Remote BranchDataSource remoteBranchDataSource,
-									 @Remote AccessTokenDataSource remoteAccessTokenDataSource,
-									 @Remote CommitDataSource remoteCommitDataSource) {
+									 @Remote CommitDataSource remoteCommitDataSource,
+									 @Remote AccessTokenDataSource remoteAccessTokenDataSource) {
 		this.localRepoDataSource = localRepoDataSource;
 		this.remoteRepoDataSource = remoteRepoDataSource;
 		this.remoteBranchDataSource = remoteBranchDataSource;
