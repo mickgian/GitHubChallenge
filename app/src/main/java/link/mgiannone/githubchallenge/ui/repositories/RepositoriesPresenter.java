@@ -104,8 +104,11 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 			String totalRepoString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
 			Log.d(TAG, "Total repos for current user are " + totalRepoString);
 
+			// TODO once we know how many repositories we have, we can decide how many calls to do (total repositories/100 rounded up )
+
 			//get the repositories
 			searchRepo(view.getOwner());
+
 		} else{
 			searchRepo(view.getOwner());
 		}

@@ -38,7 +38,7 @@
             android:id="@+id/repo_title_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:lines="2"
@@ -53,24 +53,24 @@
             android:id="@+id/repo_label_language_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:text="@string/repo_label_language"
             android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/repo_language_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:gravity="end"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/repo_label_language_text_view"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/repo_label_description_text_view"
@@ -83,7 +83,7 @@
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_branches_count_text_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_stars_count_text_view"/>
 
         <TextView
             android:id="@+id/repo_description_text_view"
@@ -101,7 +101,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/repo_label_description_text_view"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_branches_count_text_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_stars_count_text_view"/>
 
         <TextView
             android:id="@+id/repo_label_stars_count_text_view"
@@ -112,7 +112,7 @@
             android:text="@string/repo_label_stars"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_language_text_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
 
         <TextView
             android:id="@+id/repo_stars_count_text_view"
@@ -123,18 +123,18 @@
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/repo_label_stars_count_text_view"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_language_text_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
 
         <TextView
             android:id="@+id/repo_label_forks_count_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
             android:text="@string/repo_label_forks"
             android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@+id/guideline2"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_language_text_view"/>
+            app:layout_constraintStart_toEndOf="@+id/repo_stars_count_text_view"
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
 
         <TextView
             android:id="@+id/repo_forks_count_text_view"
@@ -145,18 +145,18 @@
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/repo_label_forks_count_text_view"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_language_text_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
 
         <TextView
             android:id="@+id/repo_label_branches_count_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
             android:text="@string/repo_label_branches"
             android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_stars_count_text_view"/>
+            app:layout_constraintStart_toEndOf="@+id/repo_forks_count_text_view"
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
 
         <TextView
             android:id="@+id/repo_branches_count_text_view"
@@ -167,7 +167,7 @@
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/repo_label_branches_count_text_view"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_stars_count_text_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
 
         <TextView
             android:id="@+id/repo_label_commits_count_text_view"
@@ -178,7 +178,7 @@
             android:text="@string/repo_label_commits"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/repo_branches_count_text_view"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_stars_count_text_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
 
         <TextView
             android:id="@+id/repo_commits_count_text_view"
@@ -191,7 +191,7 @@
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/repo_label_commits_count_text_view"
-            app:layout_constraintTop_toBottomOf="@+id/repo_label_stars_count_text_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/repo_label_title_text_view"/>
 
 
         <androidx.constraintlayout.widget.Guideline
