@@ -9,7 +9,7 @@ import retrofit2.Response;
 
 public interface RepoDataSource {
 
-	Observable<Response<List<Headers>>> checkReposPerUser(String owner);
+	Observable<Response<List<Headers>>> checkReposPerUser(String owner, String accessTokenString, String accessTokenTypeString, String perPageValue);
 
 	Observable<List<Repo>> loadRepos(boolean forceRemote, String owner);
 

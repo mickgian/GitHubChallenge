@@ -1,6 +1,7 @@
 package link.mgiannone.githubchallenge.data.repository;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -15,6 +16,7 @@ import io.reactivex.functions.Consumer;
 import link.mgiannone.githubchallenge.AndroidApplication;
 import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.model.Repo;
+import link.mgiannone.githubchallenge.ui.repositories.RepositoriesActivity;
 import okhttp3.Headers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,8 +60,8 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	//////////////////
 
 	@Override
-	public Observable<Response<List<Headers>>> checkReposPerUser(String owner) {
-		return remoteRepoDataSource.checkReposPerUser(owner);
+	public Observable<Response<List<Headers>>> checkReposPerUser(String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
+		return remoteRepoDataSource.checkReposPerUser(owner, accessTokenString, accessTokenTypeString, perPageValue);
 	}
 
 	@Override public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
@@ -239,6 +241,12 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 
 					if(accessToken != null){
 						Toast.makeText(AndroidApplication.getAppContext(), "Access Token recovered: " + accessToken.getAccesToken(), Toast.LENGTH_SHORT).show();
+
+						Intent intent = new Intent();
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+						intent.setClass(AndroidApplication.getAppContext(), RepositoriesActivity.class);
+						AndroidApplication.getAppContext().startActivity(intent);
 					}else{
 						Toast.makeText(AndroidApplication.getAppContext(), "Access Token not recovered", Toast.LENGTH_SHORT).show();
 					}

@@ -29,5 +29,6 @@
 
   //Login
   <string name="login_activity_title">Login</string>
+  <string name="login_github">Login into GitHub</string>
 
 </resources>

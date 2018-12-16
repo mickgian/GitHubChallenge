@@ -1,5 +1,6 @@
 package link.mgiannone.githubchallenge.ui.repositories;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.lifecycle.Lifecycle;
@@ -12,6 +13,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import link.mgiannone.githubchallenge.AndroidApplication;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.data.repository.GitHubChallengeRepository;
 import link.mgiannone.githubchallenge.util.schedulers.RunOn;
@@ -68,8 +70,13 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 
 	@Override
 	public void checkRepoPerUser(String owner) {
+
+		final SharedPreferences pref = AndroidApplication.getAppContext().getSharedPreferences("access_token", 0); // 0 - for private mode
+		String accessTokenString = pref.getString("oauth.accesstoken", "");
+		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
+
 		// Load new one and populate it into view
-		Disposable disposable = repository.checkReposPerUser(owner)
+		Disposable disposable = repository.checkReposPerUser(owner, accessTokenString, accessTokenTypeString, "1")
 				.subscribeOn(ioScheduler)
 				.observeOn(uiScheduler)
 				.subscribe(this::handleReturnedHeaderData, this::handleHeaderError);
@@ -80,6 +87,8 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 		//getting value 'Link' from response headers
 		String link = response.headers().get("Link");
 		String message = response.message();
+		String limit = response.headers().get("X-RateLimit-Limit");
+		String limitRemaining = response.headers().get("X-RateLimit-Remaining");
 		int code = response.code();
 
 		if(code == 404 && message.toLowerCase().equalsIgnoreCase("not found")) {

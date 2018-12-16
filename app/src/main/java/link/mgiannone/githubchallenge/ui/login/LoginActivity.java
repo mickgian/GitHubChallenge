@@ -65,9 +65,4 @@ public class LoginActivity extends BaseActivity implements LoginContract.View{
 
 	}
 
-	@Override public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.login, menu);
-		return true;
-	}
-
 }

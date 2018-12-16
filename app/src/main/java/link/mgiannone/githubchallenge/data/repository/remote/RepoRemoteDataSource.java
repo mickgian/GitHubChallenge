@@ -21,8 +21,8 @@ public class RepoRemoteDataSource implements RepoDataSource {
 	}
 
 	@Override
-	public Observable<Response<List<Headers>>> checkReposPerUser(String owner) {
-		return repoService.checkReposPerUser(owner);
+	public Observable<Response<List<Headers>>> checkReposPerUser(String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
+		return repoService.checkReposPerUser(owner, accessTokenString, accessTokenTypeString, perPageValue);
 	}
 
 	@Override

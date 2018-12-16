@@ -21,7 +21,7 @@ public class RepoLocalDataSource implements RepoDataSource {
 	}
 
 	@Override
-	public Observable<Response<List<Headers>>> checkReposPerUser(String owner) {
+	public Observable<Response<List<Headers>>> checkReposPerUser(String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
 		return null;
 	}
 

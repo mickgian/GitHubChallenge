@@ -46,7 +46,6 @@ public class GitHubChallengeApiServiceModule {
 								   HttpLoggingInterceptor httpInterceptor) {
 		return new OkHttpClient.Builder().addInterceptor(headerInterceptor)
 				.addInterceptor(httpInterceptor)
-				.authenticator(new TokenAuthenticator())
 				.build();
 	}
 
