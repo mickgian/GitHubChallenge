@@ -8,6 +8,8 @@ import io.reactivex.Observable;
 import link.mgiannone.githubchallenge.data.api.RepoService;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.data.repository.RepoDataSource;
+import okhttp3.Headers;
+import retrofit2.Response;
 
 public class RepoRemoteDataSource implements RepoDataSource {
 
@@ -16,6 +18,11 @@ public class RepoRemoteDataSource implements RepoDataSource {
 	@Inject
 	public RepoRemoteDataSource(RepoService repoService) {
 		this.repoService = repoService;
+	}
+
+	@Override
+	public Observable<Response<List<Headers>>> checkReposPerUser(String owner) {
+		return repoService.checkReposPerUser(owner);
 	}
 
 	@Override

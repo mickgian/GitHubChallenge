@@ -20,6 +20,12 @@ public interface RepositoriesContract {
 		void stopLoadingIndicator();
 
 		void showEmptySearchResult();
+
+		void showUserNotFoundMessage();
+
+		void showApiRateLimitExceeded();
+
+		String getOwner();
 	}
 
 	interface Presenter extends BasePresenter<View> {
@@ -28,5 +34,7 @@ public interface RepositoriesContract {
 		void getRepo(int repoId);
 
 		void searchRepo(String repoTitle);
+
+		void checkRepoPerUser(String query);
 	}
 }

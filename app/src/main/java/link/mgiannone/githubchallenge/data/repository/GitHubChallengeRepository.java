@@ -52,6 +52,11 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	////  REPOS  /////
 	//////////////////
 
+	@Override
+	public Observable<Response<List<Headers>>> checkReposPerUser(String owner) {
+		return remoteRepoDataSource.checkReposPerUser(owner);
+	}
+
 	@Override public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
 		if (forceRemote) {
 			return refreshData(forceRemote, owner);
@@ -88,62 +93,75 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	 */
 	Observable<List<Repo>> refreshData(boolean forceRemote, String owner) {
 
-		if(forceRemote) {
-			clearCacheAndLocalDB();
-		}
+			if (forceRemote) {
+				clearCacheAndLocalDB();
+			}
 
-		return remoteRepoDataSource.loadRepos(true, owner)
-				.flatMap(Observable::fromIterable)
-				.doOnNext(repo ->
-						 remoteBranchDataSource.countBranches(true, owner, repo.getName())
-								.subscribe(new Consumer<Response<List<Headers>>>() {
-									@Override
-									public void accept(Response<List<Headers>> response) throws Exception {
+			return remoteRepoDataSource.loadRepos(true, owner)
+					.flatMap(Observable::fromIterable)
+					.doOnNext(repo ->
+							remoteBranchDataSource.countBranches(true, owner, repo.getName())
+									.subscribe(new Consumer<Response<List<Headers>>>() {
+												   @Override
+												   public void accept(Response<List<Headers>> response) throws Exception {
 
-										//getting value 'Link' from response headers
-										String link = response.headers().get("Link");
-										if(link == null){ //Link value is not present into the header, it means there's only 1 branch, the master one.
-											repo.setBranchesCount(1);
-											Log.d(TAG, "Total branches for repository " + repo.getName() + " is 1.");
+													   //getting value 'Link' from response headers
+													   String link = response.headers().get("Link");
+													   if (link == null) { //Link value is not present into the header, it means there's only 1 branch, the master one.
+														   repo.setBranchesCount(1);
+														   Log.d(TAG, "Total branches for repository " + repo.getName() + " is 1.");
 
-										}else {
+													   } else {
 
-											//get last page number: considering that we requested all the branches paginated with
-											//only 1 branch per page, the last page number is equal to the total number of branches
-											String totalBranchesString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
-											Log.d(TAG, "Total branches for repository " + repo.getName() + " are " + totalBranchesString);
+														   //get last page number: considering that we requested all the branches paginated with
+														   //only 1 branch per page, the last page number is equal to the total number of branches
+														   String totalBranchesString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
+														   Log.d(TAG, "Total branches for repository " + repo.getName() + " are " + totalBranchesString);
 
-											//set commits number into Repo object
-											repo.setBranchesCount(Integer.valueOf(totalBranchesString));
-										}
-									}
-								}
+														   //set commits number into Repo object
+														   repo.setBranchesCount(Integer.valueOf(totalBranchesString));
+													   }
+												   }
+											   }, new Consumer<Throwable>() {
+												   @Override
+												   public void accept(Throwable throwable) throws Exception {
+													   Log.e(TAG, throwable.getMessage(), throwable);
+												   }
+											   }
 
-						)
-				).doOnNext(repo -> {
+									)
+					)
+					.doOnNext(repo -> {
 						remoteCommitDataSource.countCommits(true, owner, repo.getName())
 								.subscribe(new Consumer<Response<List<Headers>>>() {
-											@Override
-											public void accept(Response<List<Headers>> response) throws Exception {
+											   @Override
+											   public void accept(Response<List<Headers>> response) throws Exception {
 
-												//getting value 'Link' from response headers
-												String link = response.headers().get("Link");
+												   //getting value 'Link' from response headers
+												   String link = response.headers().get("Link");
 
-												//get last page number: considering that we requested all the commits paginated with
-												//only 1 commit per page, the last page number is equal to the total number of commits
-												String totalCommitsString = link.substring(link.lastIndexOf("&page=")+6, link.lastIndexOf(">"));
-												Log.d(TAG, "Total commits for repository " + repo.getName() + " are " + totalCommitsString);
+												   //get last page number: considering that we requested all the commits paginated with
+												   //only 1 commit per page, the last page number is equal to the total number of commits
+												   String totalCommitsString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
+												   Log.d(TAG, "Total commits for repository " + repo.getName() + " are " + totalCommitsString);
 
-												//set commits number into Repo object
-												repo.setCommitsCount(Integer.valueOf(totalCommitsString));
+												   //set commits number into Repo object
+												   repo.setCommitsCount(Integer.valueOf(totalCommitsString));
 
-											}
-										}
+											   }
+										   }, new Consumer<Throwable>() {
+											   @Override
+											   public void accept(Throwable throwable) throws Exception {
+												   Log.e(TAG, throwable.getMessage(), throwable);
+											   }
+										   }
 								);
-				}).flatMap(Observable::fromArray).doOnNext(repo -> {
-					repoCaches.add(repo);
-					localRepoDataSource.addRepo(repo);
-				}).toList().toObservable();
+					})
+					.flatMap(Observable::fromArray).doOnNext(repo -> {
+						repoCaches.add(repo);
+						localRepoDataSource.addRepo(repo);
+					})
+					.toList().toObservable();
 
 	}
 

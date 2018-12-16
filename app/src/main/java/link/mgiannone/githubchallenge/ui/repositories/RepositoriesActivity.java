@@ -40,10 +40,15 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_repositories);
-		actionBarSetup(RepositoriesActivity.this);
 		ButterKnife.bind(this);
 		initializePresenter();
 		setupWidgets();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		actionBarSetup(RepositoriesActivity.this);
 	}
 
 	@Override
@@ -57,6 +62,15 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 				.gitHubChallengeRepositoryComponent(getGitHubChallengeRepositoryComponent())
 				.build()
 				.inject(this);
+	}
+
+	@Override
+	public String getOwner() {
+		if(searchView == null){
+			return "";
+		}else {
+			return searchView.getQuery().toString();
+		}
 	}
 
 	private void setupWidgets() {
@@ -86,7 +100,8 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override public boolean onQueryTextSubmit(String query) {
 				owner = query;
-				presenter.searchRepo(query);
+				presenter.checkRepoPerUser(query);
+				searchView.clearFocus();
 				repoOwnerTextView.setText(query);
 				return true;
 			}
@@ -100,6 +115,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	}
 
 	@Override public void showRepos(List<Repo> repositories) {
+		refreshLayout.setVisibility(View.VISIBLE);
 		notificationText.setVisibility(View.GONE);
 		adapter.replaceData(repositories);
 	}
@@ -132,7 +148,22 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		showNotification(getString(R.string.msg_empty_repo_search_result));
 	}
 
+	@Override
+	public void showUserNotFoundMessage() {
+		refreshLayout.setVisibility(View.GONE);
+		notificationText.setVisibility(View.VISIBLE);
+		notificationText.setText(getString(R.string.no_user_found));
+	}
+
+	@Override
+	public void showApiRateLimitExceeded() {
+		refreshLayout.setVisibility(View.GONE);
+		notificationText.setVisibility(View.VISIBLE);
+		notificationText.setText(R.string.api_rate_limit_exceeded);
+	}
+
 	private void showNotification(String message) {
+		refreshLayout.setVisibility(View.GONE);
 		notificationText.setVisibility(View.VISIBLE);
 		notificationText.setText(message);
 	}

@@ -80,8 +80,9 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textAppearance="?android:textAppearanceMedium"
-                android:visibility="gone"
-                />
+                android:textColor="@color/actionColor"
+                android:textSize="24sp"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

@@ -31,7 +31,6 @@ public class LoginActivity extends BaseActivity implements LoginContract.View{
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-		actionBarSetup(LoginActivity.this);
 		ButterKnife.bind(this);
 		initializePresenter();
 		setupWidgets();
@@ -41,6 +40,8 @@ public class LoginActivity extends BaseActivity implements LoginContract.View{
 	@Override
 	protected void onResume(){
 		super.onResume();
+
+		actionBarSetup(LoginActivity.this);
 
 		Uri uri = getIntent().getData();
 
