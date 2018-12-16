@@ -33,7 +33,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 	private SearchView searchView;
 	private RepositoriesAdapter adapter;
-	private String owner = "";
+	private String owner = "mickgian";
 	private ProgressDialog dialog;
 
 	@Inject
