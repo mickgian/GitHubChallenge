@@ -1,5 +1,6 @@
 package link.mgiannone.githubchallenge.ui.repositories;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -33,6 +34,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	private SearchView searchView;
 	private RepositoriesAdapter adapter;
 	private String owner = "";
+	private ProgressDialog dialog;
 
 	@Inject
 	RepositoriesPresenter presenter;
@@ -54,6 +56,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		repoOwnerTextView.setText(savedInstanceState.getString("owner"));
+		notificationText.setText(savedInstanceState.getString("notification_text"));
 	}
 
 	private void initializePresenter() {
@@ -66,10 +69,10 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 	@Override
 	public String getOwner() {
-		if(searchView == null){
+		if(owner == null){
 			return "";
 		}else {
-			return searchView.getQuery().toString();
+			return owner;
 		}
 	}
 
@@ -102,7 +105,9 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 				owner = query;
 				presenter.checkRepoPerUser(query);
 				searchView.clearFocus();
-				repoOwnerTextView.setText(query);
+				dialog = new ProgressDialog(RepositoriesActivity.this);
+				dialog.setTitle(getApplicationContext().getResources().getString(R.string.data_loading));
+				dialog.show();
 				return true;
 			}
 
@@ -118,6 +123,10 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		refreshLayout.setVisibility(View.VISIBLE);
 		notificationText.setVisibility(View.GONE);
 		adapter.replaceData(repositories);
+		repoOwnerTextView.setText(repositories.get(0).getOwner().getLogin());
+		if(dialog != null && dialog.isShowing()){
+			dialog.dismiss();
+		}
 	}
 
 	@Override public void showNoDataMessage() {
@@ -150,6 +159,9 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 	@Override
 	public void showUserNotFoundMessage() {
+		if(dialog != null && dialog.isShowing()){
+			dialog.dismiss();
+		}
 		refreshLayout.setVisibility(View.GONE);
 		notificationText.setVisibility(View.VISIBLE);
 		notificationText.setText(getString(R.string.no_user_found));
@@ -157,12 +169,18 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 	@Override
 	public void showApiRateLimitExceeded() {
+		if(dialog != null && dialog.isShowing()){
+			dialog.dismiss();
+		}
 		refreshLayout.setVisibility(View.GONE);
 		notificationText.setVisibility(View.VISIBLE);
 		notificationText.setText(R.string.api_rate_limit_exceeded);
 	}
 
 	private void showNotification(String message) {
+		if(dialog != null && dialog.isShowing()){
+			dialog.dismiss();
+		}
 		refreshLayout.setVisibility(View.GONE);
 		notificationText.setVisibility(View.VISIBLE);
 		notificationText.setText(message);
@@ -172,6 +190,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putString("owner", repoOwnerTextView.getText().toString());
+		outState.putString("notification_text", notificationText.getText().toString());
 
 		// call superclass to save any view hierarchy
 		super.onSaveInstanceState(outState);

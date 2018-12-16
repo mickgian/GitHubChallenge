@@ -18,7 +18,8 @@ public class BranchRemoteDataSource implements BranchDataSource {
 	}
 
 	@Override
-	public Observable<Response<List<Headers>>> countBranches(boolean forceRemote, String owner, String repoName) {
-		return branchService.countBranches(owner, repoName);
+	public Observable<Response<List<Headers>>> countBranches(boolean forceRemote, String owner, String repoName, String accessTokenString,
+															 String accessTokenTypeString, String perPageValue) {
+		return branchService.countBranches(owner, repoName, accessTokenString, accessTokenTypeString, perPageValue);
 	}
 }

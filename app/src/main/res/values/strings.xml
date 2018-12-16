@@ -11,11 +11,12 @@
   <string name="msg_no_data">No data returned. Pull to refresh.</string>
   <string name="search_hint">Enter question title</string>
   <string name="no_user_found">The searched user does not exist. Please enter a valid GitHub user name.</string>
-  <string name="api_rate_limit_exceeded">API rate limit exceeded</string>
+  <string name="api_rate_limit_exceeded">API rate limit exceeded. Do the login and try again.</string>
 
   //Repos
   <string name="repos_activity_title">Repositories</string>
   <string name="repo_search_hint">Look for user</string>
+  <string name="data_loading">Loading repositories...</string>
   <string name="msg_empty_repo_search_result">No repositories found for the current user.</string>
   <string name="repos_by_user">Repositories for user:</string>
   <string name="repo_label_title">Repository name:</string>
@@ -25,6 +26,7 @@
   <string name="repo_label_forks">Forks:</string>
   <string name="repo_label_branches">Branches:</string>
   <string name="repo_label_commits">Commits:</string>
+  <string name="generic_error">Something has gone wrong. Try again.</string>
 
 
   //Login

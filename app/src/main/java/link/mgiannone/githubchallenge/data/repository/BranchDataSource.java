@@ -7,6 +7,11 @@ import retrofit2.Response;
 
 public interface BranchDataSource {
 
-	Observable<Response<List<Headers>>> countBranches(boolean forceRemote, String owner, String repoName);
+	Observable<Response<List<Headers>>> countBranches(boolean forceRemote,
+													  String owner,
+													  String repoName,
+													  String accessTokenString,
+													  String accessTokenTypeString,
+													  String perPageValue);
 
 }

@@ -64,16 +64,16 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 		return remoteRepoDataSource.checkReposPerUser(owner, accessTokenString, accessTokenTypeString, perPageValue);
 	}
 
-	@Override public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
+	@Override public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
 		if (forceRemote) {
-			return refreshData(forceRemote, owner);
+			return refreshData(forceRemote, owner, accessTokenString, accessTokenTypeString, perPageValue);
 		} else {
 			if (repoCaches.size() > 0) {
 				// if cache is available, return it immediately
 				return Observable.just(repoCaches);
 			} else {
 				// else return data from local storage
-				return localRepoDataSource.loadRepos(false, owner)
+				return localRepoDataSource.loadRepos(false, owner, "","","")
 						.take(1)
 						.flatMap(Observable::fromIterable)
 						.doOnNext(repo -> repoCaches.add(repo))
@@ -81,7 +81,7 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 						.toObservable()
 						.filter(list -> !list.isEmpty())
 						.switchIfEmpty(
-								refreshData(forceRemote, owner)); // If local data is empty, fetch from remote source instead.
+								refreshData(forceRemote, owner, accessTokenString, accessTokenTypeString, perPageValue)); // If local data is empty, fetch from remote source instead.
 			}
 		}
 	}
@@ -98,16 +98,16 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	 *
 	 * @return the Observable of newly fetched data.
 	 */
-	Observable<List<Repo>> refreshData(boolean forceRemote, String owner) {
+	Observable<List<Repo>> refreshData(boolean forceRemote, String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
 
 			if (forceRemote) {
 				clearCacheAndLocalDB();
 			}
 
-			return remoteRepoDataSource.loadRepos(true, owner)
+			return remoteRepoDataSource.loadRepos(true, owner, accessTokenString, accessTokenTypeString, perPageValue)
 					.flatMap(Observable::fromIterable)
 					.doOnNext(repo ->
-							remoteBranchDataSource.countBranches(true, owner, repo.getName())
+							remoteBranchDataSource.countBranches(true, owner, repo.getName(), accessTokenString, accessTokenTypeString, "1")
 									.subscribe(new Consumer<Response<List<Headers>>>() {
 												   @Override
 												   public void accept(Response<List<Headers>> response) throws Exception {
@@ -139,7 +139,7 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 									)
 					)
 					.doOnNext(repo -> {
-						remoteCommitDataSource.countCommits(true, owner, repo.getName())
+						remoteCommitDataSource.countCommits(true, owner, repo.getName(), accessTokenString, accessTokenTypeString, "1")
 								.subscribe(new Consumer<Response<List<Headers>>>() {
 											   @Override
 											   public void accept(Response<List<Headers>> response) throws Exception {
@@ -202,8 +202,9 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	/////////////////////
 
 	@Override
-	public Observable<Response<List<Headers>>> countBranches(boolean forceRemote, String owner, String repoName) {
-		return remoteBranchDataSource.countBranches(true, owner, repoName);
+	public Observable<Response<List<Headers>>> countBranches(boolean forceRemote, String owner, String repoName, String accessTokenString,
+															 String accessTokenTypeString, String perPageValue) {
+		return remoteBranchDataSource.countBranches(true, owner, repoName, accessTokenString, accessTokenTypeString, perPageValue);
 	}
 
 	////////////////////
@@ -211,8 +212,9 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	////////////////////
 
 	@Override
-	public Observable<Response<List<Headers>>> countCommits(boolean forceRemote, String owner, String repoName) {
-		return remoteCommitDataSource.countCommits(forceRemote, owner, repoName);
+	public Observable<Response<List<Headers>>> countCommits(boolean forceRemote, String owner, String repoName, String accessTokenString,
+															String accessTokenTypeString, String perPageValue) {
+		return remoteCommitDataSource.countCommits(forceRemote, owner, repoName, accessTokenString, accessTokenTypeString, perPageValue);
 	}
 
 	//////////////////

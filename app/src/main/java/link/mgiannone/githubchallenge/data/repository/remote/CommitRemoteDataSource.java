@@ -20,8 +20,13 @@ public class CommitRemoteDataSource implements CommitDataSource {
 	}
 
 	@Override
-	public Observable<Response<List<Headers>>> countCommits(boolean forceRemote, String owner, String repoName) {
-		return commitService.countCommits(owner, repoName);
+	public Observable<Response<List<Headers>>> countCommits(boolean forceRemote,
+															String owner,
+															String repoName,
+															String accessTokenString,
+															String accessTokenTypeString,
+															String perPageValue) {
+		return commitService.countCommits(owner, repoName, accessTokenString, accessTokenTypeString, perPageValue);
 	}
 
 }

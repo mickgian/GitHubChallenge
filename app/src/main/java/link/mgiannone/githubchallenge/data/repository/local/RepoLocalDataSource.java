@@ -26,7 +26,7 @@ public class RepoLocalDataSource implements RepoDataSource {
 	}
 
 	@Override
-	public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner) {
+	public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
 		return repoDao.getAllRepositories();
 	}
 

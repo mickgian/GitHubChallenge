@@ -21,7 +21,10 @@ public interface RepoService {
 														  @Query("per_page") String perPageValue);
 
 	//set to 100 repo per page
-	@GET("users/{username}/repos?per_page=100")
-	Observable<List<Repo>> loadRepositories(@Path("username") String owner);
+	@GET("users/{username}/repos")
+	Observable<List<Repo>> loadRepositories(@Path("username") String owner,
+											@Query("access_token") String accessTokenString,
+											@Query("token_type") String accessTokenTypeString,
+											@Query("per_page") String perPageValue);
 
 }

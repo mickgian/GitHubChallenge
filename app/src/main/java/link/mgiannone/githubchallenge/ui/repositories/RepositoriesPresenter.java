@@ -39,6 +39,7 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	private Scheduler uiScheduler;
 
 	private CompositeDisposable disposeBag;
+	private SharedPreferences pref;
 
 	@Inject
 	public RepositoriesPresenter(GitHubChallengeRepository repository, RepositoriesContract.View view,
@@ -54,13 +55,11 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 		}
 
 		disposeBag = new CompositeDisposable();
+		pref = AndroidApplication.getAppContext().getSharedPreferences("access_token", 0); // 0 - for private mode
 	}
 
 	@Override @OnLifecycleEvent(Lifecycle.Event.ON_RESUME) public void onAttach() {
-		String owner = view.getOwner();
-		if(!owner.equalsIgnoreCase("")) {
 			loadRepos(false, view.getOwner());
-		}
 	}
 
 	@Override @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE) public void onDetach() {
@@ -71,7 +70,6 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	@Override
 	public void checkRepoPerUser(String owner) {
 
-		final SharedPreferences pref = AndroidApplication.getAppContext().getSharedPreferences("access_token", 0); // 0 - for private mode
 		String accessTokenString = pref.getString("oauth.accesstoken", "");
 		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
 
@@ -101,38 +99,31 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 			searchRepo(view.getOwner());
 		} else if (code == 200 && link != null){
 
-			//get last page number: considering that we requested all the branches paginated with
-			//only 1 branch per page, the last page number is equal to the total number of branches
+			//get last page number: considering that we requested all the repos paginated with
+			//only 1 repo per page, the last page number is equal to the total number of repos
 			String totalRepoString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
 			Log.d(TAG, "Total repos for current user are " + totalRepoString);
 
 			//get the repositories
 			searchRepo(view.getOwner());
+		} else{
+			searchRepo(view.getOwner());
 		}
-//		else if (){
-//			//user exists but has zero repos
-//		}
-		else{
-
-		}
-
-
 	}
 
 	private void handleHeaderError(Throwable throwable) {
 		Log.e(TAG, throwable.getMessage(), throwable);
 	}
 
-
-
-
-
 	@Override public void loadRepos(boolean onlineRequired, String owner) {
 		// Clear old data on view
 		view.clearRepos();
 
+		String accessTokenString = pref.getString("oauth.accesstoken", "");
+		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
+
 		// Load new one and populate it into view
-		Disposable disposable = repository.loadRepos(onlineRequired, owner)
+		Disposable disposable = repository.loadRepos(onlineRequired, owner, accessTokenString, accessTokenTypeString, "100")
 				.subscribeOn(ioScheduler)
 				.observeOn(uiScheduler)
 				.subscribe(this::handleReturnedData, this::handleError, () -> view.stopLoadingIndicator());
@@ -151,8 +142,11 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 
 	@Override public void searchRepo(final String owner) {
 
+		String accessTokenString = pref.getString("oauth.accesstoken", "");
+		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
+
 		// Load new one and populate it into view
-		Disposable disposable = repository.loadRepos(true, owner)
+		Disposable disposable = repository.loadRepos(true, owner, accessTokenString, accessTokenTypeString, "100")
 				.flatMap(Observable::fromIterable)
 				.filter(repo -> repo.getName() != null)
 				.toList()

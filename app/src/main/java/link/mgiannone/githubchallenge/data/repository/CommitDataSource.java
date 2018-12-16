@@ -8,6 +8,11 @@ import retrofit2.Response;
 
 public interface CommitDataSource {
 
-	Observable<Response<List<Headers>>> countCommits(boolean forceRemote, String owner, String repoName);
+	Observable<Response<List<Headers>>> countCommits(boolean forceRemote,
+													 String owner,
+													 String repoName,
+													 String accessTokenString,
+													 String accessTokenTypeString,
+													 String perPageValue);
 
 }
