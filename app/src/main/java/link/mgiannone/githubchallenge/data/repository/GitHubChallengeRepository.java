@@ -1,13 +1,18 @@
 package link.mgiannone.githubchallenge.data.repository;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
+
 import androidx.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
+import link.mgiannone.githubchallenge.AndroidApplication;
 import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import okhttp3.Headers;
@@ -218,11 +223,8 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 		return accessTokenCall;
 	}
 
-	public AccessToken recoverAccessToken(String clientId, String clientSecret, String code){
+	public void recoverAccessToken(String clientId, String clientSecret, String code){
 
-		if(accessToken != null){
-			return accessToken;
-		}else{
 			Call<AccessToken> accessTokenCall = getToken(clientId, clientSecret,code);
 
 			accessTokenCall.enqueue(new Callback<AccessToken>() {
@@ -230,6 +232,16 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 				public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
 					Log.d(TAG, "Token Access succesfully recovered");
 					accessToken = response.body();
+
+					final SharedPreferences prefs = AndroidApplication.getAppContext().getSharedPreferences("access_token", Context.MODE_PRIVATE);
+					prefs.edit().putString("oauth.accesstoken", accessToken.getAccesToken()).apply();
+					prefs.edit().putString("oauth.tokentype", accessToken.getTokenType()).apply();
+
+					if(accessToken != null){
+						Toast.makeText(AndroidApplication.getAppContext(), "Access Token recovered: " + accessToken.getAccesToken(), Toast.LENGTH_SHORT).show();
+					}else{
+						Toast.makeText(AndroidApplication.getAppContext(), "Access Token not recovered", Toast.LENGTH_SHORT).show();
+					}
 				}
 
 				@Override
@@ -238,8 +250,6 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 				}
 			});
 
-			return accessToken;
-		}
 	}
 
 	private static class deleteAllReposAsyncTask extends AsyncTask<Void, Void, Void> {

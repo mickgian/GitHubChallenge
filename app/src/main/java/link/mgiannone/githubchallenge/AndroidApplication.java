@@ -1,6 +1,8 @@
 package link.mgiannone.githubchallenge;
 
 import android.app.Application;
+import android.content.Context;
+
 import com.facebook.stetho.Stetho;
 
 import com.squareup.leakcanary.LeakCanary;
@@ -12,10 +14,13 @@ import timber.log.Timber;
 public class AndroidApplication extends Application {
 
   private GitHubChallengeRepositoryComponent gitHubChallengeRepositoryComponent;
+  private static Context context;
 
   @Override
   public void onCreate() {
     super.onCreate();
+
+    AndroidApplication.context = getApplicationContext();
 
     initializeDependencies();
 
@@ -38,5 +43,10 @@ public class AndroidApplication extends Application {
 
   public GitHubChallengeRepositoryComponent getGitHubChallengeRepositoryComponent() {
     return gitHubChallengeRepositoryComponent;
+  }
+
+  //to get application context from any class
+  public static Context getAppContext() {
+    return AndroidApplication.context;
   }
 }

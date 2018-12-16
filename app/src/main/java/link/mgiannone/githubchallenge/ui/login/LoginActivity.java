@@ -4,10 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import javax.inject.Inject;
 
@@ -21,9 +18,6 @@ public class LoginActivity extends BaseActivity implements LoginContract.View{
 
 	@BindView(R.id.loginButton)
 	Button loginButton;
-
-	TextView notificationText;
-
 
 	@Inject
 	LoginPresenter presenter;
@@ -73,29 +67,7 @@ public class LoginActivity extends BaseActivity implements LoginContract.View{
 
 	@Override public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.login, menu);
-
-
 		return true;
-	}
-
-	@Override public void showNoDataMessage() {
-		showNotification(getString(R.string.msg_no_data));
-	}
-
-	@Override
-	public void showSuccessMessage(String accessTokenString) {
-		Toast.makeText(LoginActivity.this, "Access token: " +accessTokenString, Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void showErrorMessage() {
-	}
-
-
-
-	private void showNotification(String message) {
-		notificationText.setVisibility(View.VISIBLE);
-		notificationText.setText(message);
 	}
 
 }

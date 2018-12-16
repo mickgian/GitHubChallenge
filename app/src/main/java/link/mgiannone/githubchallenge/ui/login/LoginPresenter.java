@@ -8,7 +8,6 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.repository.GitHubChallengeRepository;
 import link.mgiannone.githubchallenge.util.schedulers.RunOn;
 
@@ -51,25 +50,8 @@ public class LoginPresenter implements LoginContract.Presenter, LifecycleObserve
 		disposeBag.clear();
 	}
 
-
-	@Override
-	public void sendSuccessMessageToView(String accessTokenString) {
-		view.showSuccessMessage(accessTokenString);
-	}
-
-	@Override
-	public void sendErrorMessageToView() {
-		view.showErrorMessage();
-	}
-
 	@Override
 	public void getAccessToken(String clientId, String clientSecret, String code) {
-		AccessToken accessToken = repository.recoverAccessToken(clientId, clientSecret, code);
-
-		if(accessToken == null){
-			sendErrorMessageToView();
-		}else{
-			sendSuccessMessageToView(accessToken.getAccesToken());
-		}
+		repository.recoverAccessToken(clientId, clientSecret, code);
 	}
 }
