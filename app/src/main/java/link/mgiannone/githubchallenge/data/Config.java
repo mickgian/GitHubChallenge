@@ -2,7 +2,6 @@ package link.mgiannone.githubchallenge.data;
 
 public class Config {
 
-  public static final String GITHUB_HOST = "https://github.com/";
   public static final String GITHUB_API_HOST = "https://api.github.com/";
   public static final String GITHUB_API_AUTHORIZE = "https://github.com/login/oauth/authorize";
   public static final String GITHUBCHALLENGE_DATABASE_NAME = "GitHubChallenge.db";

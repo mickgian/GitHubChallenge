@@ -1,21 +1,26 @@
 package link.mgiannone.githubchallenge.ui.repositories;
 
-import android.os.Bundle;
+
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
+
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 import link.mgiannone.githubchallenge.R;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.ui.base.BaseActivity;
@@ -35,7 +40,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 	private SearchView searchView;
 	private RepositoriesAdapter adapter;
-	private String owner = "mickgian";
+	private String owner = "mickgian"; //when app starts to show repository for this app
 
 	@Inject
 	RepositoriesPresenter presenter;
@@ -104,7 +109,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override public boolean onQueryTextSubmit(String query) {
 				owner = query;
-				presenter.checkRepoPerUser(query);
+				presenter.checkRepoPerUser(query); //starting first call
 				searchView.clearFocus();
 				loadReposProgressBar.setVisibility(View.VISIBLE);
 				return true;
@@ -126,6 +131,18 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		loadReposProgressBar.setVisibility(View.GONE);
 	}
 
+	@Override public void showRepositoryDetail(Repo repo) {
+//		Intent intent = new Intent(RepositoriesActivity.this, RepositoryDetail.class);
+//		startActivity(intent);
+	}
+
+	@Override public void clearRepos() {
+		adapter.clearData();
+	}
+
+
+
+
 	@Override public void showNoDataMessage() {
 		showNotification(getString(R.string.msg_no_data));
 	}
@@ -134,19 +151,10 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		showNotification(error);
 	}
 
-	@Override public void clearRepos() {
-		adapter.clearData();
-	}
-
 	@Override public void stopLoadingIndicator() {
 		if (refreshLayout.isRefreshing()) {
 			refreshLayout.setRefreshing(false);
 		}
-	}
-
-	@Override public void showRepositoryDetail(Repo repo) {
-//		Intent intent = new Intent(RepositoriesActivity.this, RepositoryDetail.class);
-//		startActivity(intent);
 	}
 
 	@Override public void showEmptySearchResult() {

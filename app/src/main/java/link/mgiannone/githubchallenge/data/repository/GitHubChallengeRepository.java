@@ -8,15 +8,19 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.VisibleForTesting;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
+
 import link.mgiannone.githubchallenge.AndroidApplication;
 import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.ui.repositories.RepositoriesActivity;
+
 import okhttp3.Headers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -81,7 +85,7 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 						.toObservable()
 						.filter(list -> !list.isEmpty())
 						.switchIfEmpty(
-								refreshData(forceRemote, owner, accessTokenString, accessTokenTypeString, perPageValue)); // If local data is empty, fetch from remote source instead.
+								refreshData(forceRemote, owner, accessTokenString, accessTokenTypeString, perPageValue)); // If local storage is empty, fetch from remote source instead.
 			}
 		}
 	}
@@ -104,9 +108,9 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 				clearCacheAndLocalDB();
 			}
 
-			return remoteRepoDataSource.loadRepos(true, owner, accessTokenString, accessTokenTypeString, perPageValue)
+			return remoteRepoDataSource.loadRepos(true, owner, accessTokenString, accessTokenTypeString, perPageValue) //getting repositories from GitHub
 					.flatMap(Observable::fromIterable)
-					.doOnNext(repo ->
+					.doOnNext(repo ->  //for each repository, get count of branches asking for them paginated by 1 and checking header response
 							remoteBranchDataSource.countBranches(true, owner, repo.getName(), accessTokenString, accessTokenTypeString, "1")
 									.subscribe(new Consumer<Response<List<Headers>>>() {
 												   @Override
@@ -138,7 +142,7 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 
 									)
 					)
-					.doOnNext(repo -> {
+					.doOnNext(repo -> {  //for each repository, get count of commits asking for them paginated by 1 and checking header response
 						remoteCommitDataSource.countCommits(true, owner, repo.getName(), accessTokenString, accessTokenTypeString, "1")
 								.subscribe(new Consumer<Response<List<Headers>>>() {
 											   @Override
@@ -165,8 +169,8 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 								);
 					})
 					.flatMap(Observable::fromArray).doOnNext(repo -> {
-						repoCaches.add(repo);
-						localRepoDataSource.addRepo(repo);
+						repoCaches.add(repo); //adding repositories to cache
+						localRepoDataSource.addRepo(repo); //adding repositories to local DB
 					})
 					.toList().toObservable();
 
@@ -229,7 +233,7 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 
 	public void recoverAccessToken(String clientId, String clientSecret, String code){
 
-			Call<AccessToken> accessTokenCall = getToken(clientId, clientSecret,code);
+			Call<AccessToken> accessTokenCall = remoteAccessTokenDataSource.getToken(clientId, clientSecret, code);
 
 			accessTokenCall.enqueue(new Callback<AccessToken>() {
 				@Override
@@ -238,11 +242,12 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 					accessToken = response.body();
 
 					final SharedPreferences prefs = AndroidApplication.getAppContext().getSharedPreferences("access_token", Context.MODE_PRIVATE);
-					prefs.edit().putString("oauth.accesstoken", accessToken.getAccesToken()).apply();
+					prefs.edit().putString("oauth.accesstoken", accessToken.getAccessToken()).apply();
 					prefs.edit().putString("oauth.tokentype", accessToken.getTokenType()).apply();
 
+					//this is bad, just wanted to show quickly the token, should've sent to LoginPresenter and then to UI
 					if(accessToken != null){
-						Toast.makeText(AndroidApplication.getAppContext(), "Access Token recovered: " + accessToken.getAccesToken(), Toast.LENGTH_SHORT).show();
+						Toast.makeText(AndroidApplication.getAppContext(), "Access Token recovered: " + accessToken.getAccessToken(), Toast.LENGTH_LONG).show();
 
 						Intent intent = new Intent();
 						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -250,7 +255,7 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 						intent.setClass(AndroidApplication.getAppContext(), RepositoriesActivity.class);
 						AndroidApplication.getAppContext().startActivity(intent);
 					}else{
-						Toast.makeText(AndroidApplication.getAppContext(), "Access Token not recovered", Toast.LENGTH_SHORT).show();
+						Toast.makeText(AndroidApplication.getAppContext(), "Access Token not recovered", Toast.LENGTH_LONG).show();
 					}
 				}
 

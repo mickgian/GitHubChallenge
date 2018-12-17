@@ -18,6 +18,6 @@ public class AccessTokenRemoteDataSource implements AccessTokenDataSource {
 
 	@Override
 	public Call<AccessToken> getToken(String clientId, String clientSecret, String code){
-		return accessTokenService.getAccessToken(clientId, clientSecret, code, "https://github.com/login/oauth/access_token");
+		return accessTokenService.getAccessToken(clientId, clientSecret, code, "https://github.com/login/oauth/access_token"); //url provided manually to change it at runtime
 	}
 }

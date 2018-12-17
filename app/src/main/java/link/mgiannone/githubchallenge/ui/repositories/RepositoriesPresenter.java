@@ -7,16 +7,20 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
+
 import java.util.List;
 import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+
 import link.mgiannone.githubchallenge.AndroidApplication;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.data.repository.GitHubChallengeRepository;
 import link.mgiannone.githubchallenge.util.schedulers.RunOn;
+
 import okhttp3.Headers;
 import retrofit2.Response;
 
@@ -59,7 +63,7 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	}
 
 	@Override @OnLifecycleEvent(Lifecycle.Event.ON_RESUME) public void onAttach() {
-			loadRepos(false, view.getOwner());
+		loadRepos(false, view.getOwner());
 	}
 
 	@Override @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE) public void onDetach() {
@@ -67,13 +71,16 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 		disposeBag.clear();
 	}
 
+
 	@Override
 	public void checkRepoPerUser(String owner) {
 
+		//recovering access token data from Shared Preferences
 		String accessTokenString = pref.getString("oauth.accesstoken", "");
 		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
 
-		// Load new one and populate it into view
+		//Asking for a list of repositories with 1 repository per page.
+		//This let us know how many repositories we found and also to deal with error response code
 		Disposable disposable = repository.checkReposPerUser(owner, accessTokenString, accessTokenTypeString, "1")
 				.subscribeOn(ioScheduler)
 				.observeOn(uiScheduler)
@@ -114,7 +121,7 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 				if(link == null){ //Link value is not present into the header, it means there's 0 or 1 repo
 					Log.d(TAG, "Total repos for current user is 0 or 1.");
 					//get the repository
-					searchRepo(view.getOwner());
+					searchRepo(view.getOwner()); //Starting looking for data
 				}else{
 					//get last page number: considering that we requested all the repos paginated with
 					//only 1 repo per page, the last page number is equal to the total number of repos
@@ -124,42 +131,17 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 					// TODO once we know how many repositories we have, we can decide how many calls to do (total repositories/100 rounded up )
 
 					//get the repositories
-					searchRepo(view.getOwner());
+					searchRepo(view.getOwner()); //Starting 3 looking for data
 				}
 				break;
 			default:
-				searchRepo(view.getOwner());
+				searchRepo(view.getOwner()); //Starting 3 looking for data
 				break;
 		}
 	}
 
 	private void handleHeaderError(Throwable throwable) {
 		Log.e(TAG, throwable.getMessage(), throwable);
-	}
-
-	@Override public void loadRepos(boolean onlineRequired, String owner) {
-		// Clear old data on view
-		view.clearRepos();
-
-		String accessTokenString = pref.getString("oauth.accesstoken", "");
-		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
-
-		// Load new one and populate it into view
-		Disposable disposable = repository.loadRepos(onlineRequired, owner, accessTokenString, accessTokenTypeString, "100")
-				.subscribeOn(ioScheduler)
-				.observeOn(uiScheduler)
-				.subscribe(this::handleReturnedData, this::handleError, () -> view.stopLoadingIndicator());
-		disposeBag.add(disposable);
-
-	}
-
-	@Override public void getRepo(int repoId) {
-		Disposable disposable = repository.getRepo(repoId)
-				.filter(repo -> repo != null)
-				.subscribeOn(ioScheduler)
-				.observeOn(uiScheduler)
-				.subscribe(repo -> view.showRepositoryDetail(repo));
-		disposeBag.add(disposable);
 	}
 
 	@Override public void searchRepo(final String owner) {
@@ -177,17 +159,34 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 				.observeOn(uiScheduler)
 				.subscribe(repos -> {
 					if (repos.isEmpty()) {
-						// Clear old data in view
+						// Clear old data from recycler view
 						view.clearRepos();
 						// Show notification
 						view.showEmptySearchResult();
 					} else {
-						// Update filtered data
+						// Update recycler view items
 						view.showRepos(repos);
 
 					}
 				});
 
+		disposeBag.add(disposable);
+
+	}
+
+	@Override public void loadRepos(boolean onlineRequired, String owner) {
+		// Clear old data on view
+		view.clearRepos();
+
+		//recovering access token data from Shared Preferences
+		String accessTokenString = pref.getString("oauth.accesstoken", "");
+		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
+
+		// Load new repositories and paginate them with 100 (GitHub API max) repositories par page.
+		Disposable disposable = repository.loadRepos(onlineRequired, owner, accessTokenString, accessTokenTypeString, "100")
+				.subscribeOn(ioScheduler)
+				.observeOn(uiScheduler)
+				.subscribe(this::handleReturnedData, this::handleError, () -> view.stopLoadingIndicator());
 		disposeBag.add(disposable);
 
 	}
@@ -211,4 +210,15 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 		view.stopLoadingIndicator();
 		view.showErrorMessage(error.getLocalizedMessage());
 	}
+
+	@Override public void getRepo(int repoId) {
+		Disposable disposable = repository.getRepo(repoId)
+				.filter(repo -> repo != null)
+				.subscribeOn(ioScheduler)
+				.observeOn(uiScheduler)
+				.subscribe(repo -> view.showRepositoryDetail(repo));
+		disposeBag.add(disposable);
+	}
+
+
 }

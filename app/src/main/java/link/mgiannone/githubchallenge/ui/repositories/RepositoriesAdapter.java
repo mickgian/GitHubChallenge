@@ -13,7 +13,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 import io.reactivex.annotations.NonNull;
+
 import link.mgiannone.githubchallenge.R;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.ui.base.BaseRecyclerViewAdapter;

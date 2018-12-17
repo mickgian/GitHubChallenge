@@ -11,7 +11,7 @@ import retrofit2.http.Query;
 
 public interface CommitService {
 
-	//we're getting all the commits paginated with 1 commit per page
+	//we're getting all the commits paginated with 1 commit per page (perPageValue parameter will be 1)
 	@GET("repos/{username}/{repo_name}/commits")
 	Observable<Response<List<Headers>>> countCommits(@Path("username") String owner,
 													 @Path("repo_name") String repoName,
