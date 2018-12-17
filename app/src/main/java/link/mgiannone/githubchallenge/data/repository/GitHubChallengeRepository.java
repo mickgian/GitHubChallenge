@@ -245,17 +245,13 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 					prefs.edit().putString("oauth.accesstoken", accessToken.getAccessToken()).apply();
 					prefs.edit().putString("oauth.tokentype", accessToken.getTokenType()).apply();
 
-					//this is bad, just wanted to show quickly the token, should've sent to LoginPresenter and then to UI
+					//this is bad, should've done this from UI
 					if(accessToken != null){
-						Toast.makeText(AndroidApplication.getAppContext(), "Access Token recovered: " + accessToken.getAccessToken(), Toast.LENGTH_LONG).show();
-
 						Intent intent = new Intent();
 						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 						intent.setClass(AndroidApplication.getAppContext(), RepositoriesActivity.class);
 						AndroidApplication.getAppContext().startActivity(intent);
-					}else{
-						Toast.makeText(AndroidApplication.getAppContext(), "Access Token not recovered", Toast.LENGTH_LONG).show();
 					}
 				}
 
