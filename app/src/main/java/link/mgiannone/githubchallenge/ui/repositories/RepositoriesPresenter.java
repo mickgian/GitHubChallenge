@@ -82,35 +82,54 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	}
 
 	private void handleReturnedHeaderData(Response<List<Headers>> response) {
-		//getting value 'Link' from response headers
+		//getting value 'Link' from response headers in order to count the repositories
 		String link = response.headers().get("Link");
 		String message = response.message();
+
+		//checking GitHub API requests limit
 		String limit = response.headers().get("X-RateLimit-Limit");
+		Log.d(TAG, "Limit requests: " + limit);
 		String limitRemaining = response.headers().get("X-RateLimit-Remaining");
+		Log.d(TAG, "Limit requests remaining: " + limitRemaining);
+
+		//getting http response code
 		int code = response.code();
 
-		if(code == 404 && message.toLowerCase().equalsIgnoreCase("not found")) {
-			view.showUserNotFoundMessage();
-		} else if(code == 403 && message.toLowerCase().equalsIgnoreCase("forbidden")){
-			view.showApiRateLimitExceeded();
-		} else if (code == 200 && link == null) { //Link value is not present into the header, it means there's 0 or 1 repo
-			Log.d(TAG, "Total repos for current user is 0 or 1.");
-			//get the repository
-			searchRepo(view.getOwner());
-		} else if (code == 200 && link != null){
+		switch (code){
+			case 404:
+				if(message.equalsIgnoreCase("not found")){ //User not exists
+					view.showUserNotFoundMessage();
+				}else{
+					view.showErrorMessage(message);
+				}
+				break;
+			case 403:
+				if(message.equalsIgnoreCase("forbidden")){ //GitHub API requests limit reached
+					view.showApiRateLimitExceeded();
+				}else{
+					view.showErrorMessage(message);
+				}
+				break;
+			case 200:
+				if(link == null){ //Link value is not present into the header, it means there's 0 or 1 repo
+					Log.d(TAG, "Total repos for current user is 0 or 1.");
+					//get the repository
+					searchRepo(view.getOwner());
+				}else{
+					//get last page number: considering that we requested all the repos paginated with
+					//only 1 repo per page, the last page number is equal to the total number of repos
+					String totalRepoString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
+					Log.d(TAG, "Total repos for current user are " + totalRepoString);
 
-			//get last page number: considering that we requested all the repos paginated with
-			//only 1 repo per page, the last page number is equal to the total number of repos
-			String totalRepoString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
-			Log.d(TAG, "Total repos for current user are " + totalRepoString);
+					// TODO once we know how many repositories we have, we can decide how many calls to do (total repositories/100 rounded up )
 
-			// TODO once we know how many repositories we have, we can decide how many calls to do (total repositories/100 rounded up )
-
-			//get the repositories
-			searchRepo(view.getOwner());
-
-		} else{
-			searchRepo(view.getOwner());
+					//get the repositories
+					searchRepo(view.getOwner());
+				}
+				break;
+			default:
+				searchRepo(view.getOwner());
+				break;
 		}
 	}
 

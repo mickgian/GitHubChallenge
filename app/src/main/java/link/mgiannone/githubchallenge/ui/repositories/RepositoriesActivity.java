@@ -145,17 +145,18 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	}
 
 	@Override public void showRepositoryDetail(Repo repo) {
-//		Intent intent = new Intent(Intent.ACTION_VIEW);
-//		intent.setData(Uri.parse(repo.getLink()));
+//		Intent intent = new Intent(RepositoriesActivity.this, RepositoryDetail.class);
 //		startActivity(intent);
 	}
 
 	@Override public void showEmptySearchResult() {
+		repoOwnerTextView.setText(owner);
 		showNotification(getString(R.string.msg_empty_repo_search_result));
 	}
 
 	@Override
 	public void showUserNotFoundMessage() {
+		repoOwnerTextView.setText("");
 		loadReposProgressBar.setVisibility(View.GONE);
 		refreshLayout.setVisibility(View.GONE);
 		notificationText.setVisibility(View.VISIBLE);
