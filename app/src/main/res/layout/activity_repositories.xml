@@ -49,6 +49,14 @@
 
         </LinearLayout>
 
+        <ProgressBar
+            android:id="@+id/loadReposProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyleHorizontal"/>
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"

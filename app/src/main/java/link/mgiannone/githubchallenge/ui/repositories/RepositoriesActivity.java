@@ -1,6 +1,5 @@
 package link.mgiannone.githubchallenge.ui.repositories;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -10,6 +9,7 @@ import androidx.appcompat.widget.SearchView;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +30,12 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	TextView repoOwnerTextView;
 	@BindView(R.id.repo_text_notification)
 	TextView notificationText;
+	@BindView(R.id.loadReposProgressBar)
+	ProgressBar loadReposProgressBar;
 
 	private SearchView searchView;
 	private RepositoriesAdapter adapter;
 	private String owner = "mickgian";
-	private ProgressDialog dialog;
 
 	@Inject
 	RepositoriesPresenter presenter;
@@ -105,9 +106,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 				owner = query;
 				presenter.checkRepoPerUser(query);
 				searchView.clearFocus();
-				dialog = new ProgressDialog(RepositoriesActivity.this);
-				dialog.setTitle(getApplicationContext().getResources().getString(R.string.data_loading));
-				dialog.show();
+				loadReposProgressBar.setVisibility(View.VISIBLE);
 				return true;
 			}
 
@@ -124,9 +123,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		notificationText.setVisibility(View.GONE);
 		adapter.replaceData(repositories);
 		repoOwnerTextView.setText(repositories.get(0).getOwner().getLogin());
-		if(dialog != null && dialog.isShowing()){
-			dialog.dismiss();
-		}
+		loadReposProgressBar.setVisibility(View.GONE);
 	}
 
 	@Override public void showNoDataMessage() {
@@ -159,9 +156,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 	@Override
 	public void showUserNotFoundMessage() {
-		if(dialog != null && dialog.isShowing()){
-			dialog.dismiss();
-		}
+		loadReposProgressBar.setVisibility(View.GONE);
 		refreshLayout.setVisibility(View.GONE);
 		notificationText.setVisibility(View.VISIBLE);
 		notificationText.setText(getString(R.string.no_user_found));
@@ -169,18 +164,14 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 	@Override
 	public void showApiRateLimitExceeded() {
-		if(dialog != null && dialog.isShowing()){
-			dialog.dismiss();
-		}
+		loadReposProgressBar.setVisibility(View.GONE);
 		refreshLayout.setVisibility(View.GONE);
 		notificationText.setVisibility(View.VISIBLE);
 		notificationText.setText(R.string.api_rate_limit_exceeded);
 	}
 
 	private void showNotification(String message) {
-		if(dialog != null && dialog.isShowing()){
-			dialog.dismiss();
-		}
+		loadReposProgressBar.setVisibility(View.GONE);
 		refreshLayout.setVisibility(View.GONE);
 		notificationText.setVisibility(View.VISIBLE);
 		notificationText.setText(message);
