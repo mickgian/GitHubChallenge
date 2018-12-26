@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.VisibleForTesting;
 
@@ -19,6 +18,7 @@ import io.reactivex.functions.Consumer;
 import link.mgiannone.githubchallenge.AndroidApplication;
 import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.model.Repo;
+import link.mgiannone.githubchallenge.ui.login.LoginActivity;
 import link.mgiannone.githubchallenge.ui.repositories.RepositoriesActivity;
 
 import okhttp3.Headers;
@@ -118,20 +118,43 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 
 													   //getting value 'Link' from response headers
 													   String link = response.headers().get("Link");
-													   if (link == null) { //Link value is not present into the header, it means there's only 1 branch, the master one.
-														   repo.setBranchesCount(1);
-														   Log.d(TAG, "Total branches for repository " + repo.getName() + " is 1.");
 
-													   } else {
+													   //getting http response code
+													   int code = response.code();
 
-														   //get last page number: considering that we requested all the branches paginated with
-														   //only 1 branch per page, the last page number is equal to the total number of branches
-														   String totalBranchesString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
-														   Log.d(TAG, "Total branches for repository " + repo.getName() + " are " + totalBranchesString);
+													   switch (code){
+													   		case 403:
+																//Instead of showing an error, we start the login process,
+																// store another access token in shared Preferences and resend the same request that failed before,
+																Log.d(TAG, "Error 403 when counting branches");
+																Intent intentLogin = new Intent();
+																intentLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+																intentLogin.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+																intentLogin.putExtra("owner", owner);
+																intentLogin.putExtra("Class", TAG);
+																intentLogin.setClass(AndroidApplication.getAppContext(), LoginActivity.class);
+																AndroidApplication.getAppContext().startActivity(intentLogin);
+														   		break;
+														   	case 200:
+																if (link == null) {
+																	//Link value is not present into the header, it means there's only 1 branch, the master one.
+																	repo.setBranchesCount(1);
+																	Log.d(TAG, "Total branches for repository " + repo.getName() + " is 1.");
 
-														   //set commits number into Repo object
-														   repo.setBranchesCount(Integer.valueOf(totalBranchesString));
+																} else {
+
+																	//get last page number: considering that we requested all the branches paginated with
+																	//only 1 branch per page, the last page number is equal to the total number of branches
+																	String totalBranchesString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
+																	Log.d(TAG, "Total branches for repository " + repo.getName() + " are " + totalBranchesString);
+
+																	//set commits number into Repo object
+																	repo.setBranchesCount(Integer.valueOf(totalBranchesString));
+																}
+																break;
 													   }
+
+
 												   }
 											   }, new Consumer<Throwable>() {
 												   @Override
@@ -151,13 +174,38 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 												   //getting value 'Link' from response headers
 												   String link = response.headers().get("Link");
 
-												   //get last page number: considering that we requested all the commits paginated with
-												   //only 1 commit per page, the last page number is equal to the total number of commits
-												   String totalCommitsString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
-												   Log.d(TAG, "Total commits for repository " + repo.getName() + " are " + totalCommitsString);
+												   //getting http response code
+												   int code = response.code();
 
-												   //set commits number into Repo object
-												   repo.setCommitsCount(Integer.valueOf(totalCommitsString));
+												   switch(code){
+													   case 403:
+														   //Instead of showing an error, we start the login process,
+														   // store another access token in shared Preferences and resend the same request that failed before
+														   Log.d(TAG, "Error 403 when counting commits");
+														   Intent intentLogin = new Intent();
+														   intentLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+														   intentLogin.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+														   intentLogin.putExtra("owner", owner);
+														   intentLogin.putExtra("Class", TAG);
+														   intentLogin.setClass(AndroidApplication.getAppContext(), LoginActivity.class);
+														   AndroidApplication.getAppContext().startActivity(intentLogin);
+													   	break;
+													   case 200:
+
+														   if (link == null) {
+															   //Link value is not present into the header, it means there's only 1 commit.
+															   repo.setCommitsCount(1);
+														   }else{
+															   //get last page number: considering that we requested all the commits paginated with
+															   //only 1 commit per page, the last page number is equal to the total number of commits
+															   String totalCommitsString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
+
+															   Log.d(TAG, "Total commits for repository " + repo.getName() + " are " + totalCommitsString);
+
+															   //set commits number into Repo object
+															   repo.setCommitsCount(Integer.valueOf(totalCommitsString));
+														   }
+												   }
 
 											   }
 										   }, new Consumer<Throwable>() {
@@ -241,17 +289,22 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 					Log.d(TAG, "Token Access succesfully recovered");
 					accessToken = response.body();
 
-					final SharedPreferences prefs = AndroidApplication.getAppContext().getSharedPreferences("access_token", Context.MODE_PRIVATE);
+					SharedPreferences prefs = AndroidApplication.getAppContext().getSharedPreferences("access_token", Context.MODE_PRIVATE);
 					prefs.edit().putString("oauth.accesstoken", accessToken.getAccessToken()).apply();
 					prefs.edit().putString("oauth.tokentype", accessToken.getTokenType()).apply();
 
-					//this is bad, should've done this from UI
+					//getting temp owner from shared prefrences
+					prefs = AndroidApplication.getAppContext().getSharedPreferences("temp_owner", Context.MODE_PRIVATE);
+					String owner = prefs.getString("tempOwner", "");
+
 					if(accessToken != null){
-						Intent intent = new Intent();
-						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-						intent.setClass(AndroidApplication.getAppContext(), RepositoriesActivity.class);
-						AndroidApplication.getAppContext().startActivity(intent);
+						Intent intentLogin = new Intent();
+						intentLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intentLogin.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+						intentLogin.putExtra("owner", owner);
+						intentLogin.putExtra("Class", TAG);
+						intentLogin.setClass(AndroidApplication.getAppContext(), RepositoriesActivity.class);
+						AndroidApplication.getAppContext().startActivity(intentLogin);
 					}
 				}
 

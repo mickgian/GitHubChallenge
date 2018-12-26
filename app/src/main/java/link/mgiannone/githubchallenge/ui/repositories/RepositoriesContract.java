@@ -23,9 +23,11 @@ public interface RepositoriesContract {
 
 		void showUserNotFoundMessage();
 
-		void showApiRateLimitExceeded();
-
 		String getOwner();
+
+		void startLogin();
+
+		void showProgressBarIfHidden();
 	}
 
 	interface Presenter extends BasePresenter<View> {

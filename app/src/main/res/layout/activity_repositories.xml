@@ -78,6 +78,9 @@
                     android:id="@+id/recycler_repos"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:scrollbarThumbVertical="@color/actionColor"
+                    android:scrollbarSize="5dp"
                     />
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -112,7 +112,9 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 				break;
 			case 403:
 				if(message.equalsIgnoreCase("forbidden")){ //GitHub API requests limit reached
-					view.showApiRateLimitExceeded();
+					//Instead of showing an error, we start the login process,
+					// store another access token in shared Preferences and resend the same request that failed before
+					view.startLogin();
 				}else{
 					view.showErrorMessage(message);
 				}
@@ -122,7 +124,7 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 					Log.d(TAG, "Total repos for current user is 0 or 1.");
 					//get the repository
 					searchRepo(view.getOwner()); //Starting looking for data
-				}else{
+				}else if( link != null){
 					//get last page number: considering that we requested all the repos paginated with
 					//only 1 repo per page, the last page number is equal to the total number of repos
 					String totalRepoString = link.substring(link.lastIndexOf("&page=") + 6, link.lastIndexOf(">"));
@@ -145,6 +147,8 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	}
 
 	@Override public void searchRepo(final String owner) {
+
+		view.showProgressBarIfHidden();
 
 		String accessTokenString = pref.getString("oauth.accesstoken", "");
 		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
@@ -207,8 +211,12 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	 * Updates view if there is an error after loading data from repository.
 	 */
 	private void handleError(Throwable error) {
-		view.stopLoadingIndicator();
-		view.showErrorMessage(error.getLocalizedMessage());
+		if(error.getMessage().equalsIgnoreCase("http 403 forbidden")){
+			view.startLogin();
+		}else {
+			view.stopLoadingIndicator();
+			view.showErrorMessage(error.getLocalizedMessage());
+		}
 	}
 
 	@Override public void getRepo(int repoId) {

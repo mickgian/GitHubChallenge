@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -24,8 +25,11 @@ import butterknife.ButterKnife;
 import link.mgiannone.githubchallenge.R;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.ui.base.BaseActivity;
+import link.mgiannone.githubchallenge.ui.login.LoginActivity;
 
 public class RepositoriesActivity extends BaseActivity implements RepositoriesContract.View {
+
+	private static final String TAG = RepositoriesActivity.class.getSimpleName();
 
 	@BindView(R.id.recycler_repos)
 	RecyclerView repoRecyclerView;
@@ -40,7 +44,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 	private SearchView searchView;
 	private RepositoriesAdapter adapter;
-	private String owner = "mickgian"; //when app starts to show repository for this app
+	private String owner = "";
 
 	@Inject
 	RepositoriesPresenter presenter;
@@ -57,6 +61,15 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 	protected void onResume() {
 		super.onResume();
 		actionBarSetup(RepositoriesActivity.this);
+
+		String className = getIntent().getStringExtra("Class");
+
+		if (className == null){
+			owner = "mickgian";  //when app starts for the first time show its own repository
+		}else  {
+			owner = getIntent().getStringExtra("owner");
+			presenter.checkRepoPerUser(owner); //starting first call
+		}
 	}
 
 	@Override
@@ -79,6 +92,22 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 			return "";
 		}else {
 			return owner;
+		}
+	}
+
+	@Override
+	public void startLogin() {
+		Intent loginIntent = new Intent();
+		loginIntent.setClass(RepositoriesActivity.this, LoginActivity.class);
+		loginIntent.putExtra("owner", owner);
+		loginIntent.putExtra("Class", TAG);
+		startActivity(loginIntent);
+	}
+
+	@Override
+	public void showProgressBarIfHidden() {
+		if(loadReposProgressBar.getVisibility() == View.GONE){
+			loadReposProgressBar.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -169,14 +198,6 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		refreshLayout.setVisibility(View.GONE);
 		notificationText.setVisibility(View.VISIBLE);
 		notificationText.setText(getString(R.string.no_user_found));
-	}
-
-	@Override
-	public void showApiRateLimitExceeded() {
-		loadReposProgressBar.setVisibility(View.GONE);
-		refreshLayout.setVisibility(View.GONE);
-		notificationText.setVisibility(View.VISIBLE);
-		notificationText.setText(R.string.api_rate_limit_exceeded);
 	}
 
 	private void showNotification(String message) {
