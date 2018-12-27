@@ -26,8 +26,13 @@ public class RepoRemoteDataSource implements RepoDataSource {
 	}
 
 	@Override
-	public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
+	public Observable<List<Repo>> loadRemoteRepos(String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
 		return repoService.loadRepositories(owner, accessTokenString, accessTokenTypeString, perPageValue);
+	}
+
+	@Override
+	public Observable<List<Repo>> loadLocalRepos(String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
+		return null;
 	}
 
 	@Override

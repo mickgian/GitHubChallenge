@@ -31,7 +31,7 @@ public interface RepositoriesContract {
 	}
 
 	interface Presenter extends BasePresenter<View> {
-		void loadRepos(boolean onlineRequired, String owner);
+		void presenterLoadRepos(boolean onlineRequired, String owner);
 
 		void getRepo(int repoId);
 

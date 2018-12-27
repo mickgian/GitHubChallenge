@@ -66,7 +66,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 		if (className == null){
 			owner = "mickgian";  //when app starts for the first time show its own repository
-		}else  {
+		}else{
 			owner = getIntent().getStringExtra("owner");
 			presenter.checkRepoPerUser(owner); //starting first call
 		}
@@ -122,7 +122,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 				(view, position) -> presenter.getRepo(adapter.getItem(position).getId()));
 
 		// Refresh layout
-		refreshLayout.setOnRefreshListener(() -> presenter.loadRepos(true, owner));
+		refreshLayout.setOnRefreshListener(() -> presenter.presenterLoadRepos(true, owner));
 		// Set notification text visible first
 		notificationText.setVisibility(View.GONE);
 	}

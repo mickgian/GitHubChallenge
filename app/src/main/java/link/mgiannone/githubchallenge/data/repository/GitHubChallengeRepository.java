@@ -68,26 +68,24 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 		return remoteRepoDataSource.checkReposPerUser(owner, accessTokenString, accessTokenTypeString, perPageValue);
 	}
 
-	@Override public Observable<List<Repo>> loadRepos(boolean forceRemote, String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
-		if (forceRemote) {
-			return refreshData(forceRemote, owner, accessTokenString, accessTokenTypeString, perPageValue);
+	public Observable<List<Repo>> loadLocalRepos(String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
+
+		if (repoCaches.size() > 0) {
+			// if cache is available, return it immediately
+			return Observable.just(repoCaches);
 		} else {
-			if (repoCaches.size() > 0) {
-				// if cache is available, return it immediately
-				return Observable.just(repoCaches);
-			} else {
-				// else return data from local storage
-				return localRepoDataSource.loadRepos(false, owner, "","","")
-						.take(1)
-						.flatMap(Observable::fromIterable)
-						.doOnNext(repo -> repoCaches.add(repo))
-						.toList()
-						.toObservable()
-						.filter(list -> !list.isEmpty())
-						.switchIfEmpty(
-								refreshData(forceRemote, owner, accessTokenString, accessTokenTypeString, perPageValue)); // If local storage is empty, fetch from remote source instead.
-			}
+			// else return data from local storage
+			return localRepoDataSource.loadLocalRepos(owner, "","","")
+					.take(1)
+					.flatMap(Observable::fromIterable)
+					.doOnNext(repo -> repoCaches.add(repo))
+					.toList()
+					.toObservable()
+					.filter(list -> !list.isEmpty())
+					.switchIfEmpty(
+							loadRemoteRepos(owner, accessTokenString, accessTokenTypeString, perPageValue)); // If local storage is empty, fetch from remote source instead.
 		}
+
 	}
 
 	@Override
@@ -102,13 +100,12 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	 *
 	 * @return the Observable of newly fetched data.
 	 */
-	Observable<List<Repo>> refreshData(boolean forceRemote, String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
+	public Observable<List<Repo>> loadRemoteRepos(String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
 
-			if (forceRemote) {
-				clearCacheAndLocalDB();
-			}
-
-			return remoteRepoDataSource.loadRepos(true, owner, accessTokenString, accessTokenTypeString, perPageValue) //getting repositories from GitHub
+			return remoteRepoDataSource.loadRemoteRepos(owner, accessTokenString, accessTokenTypeString, perPageValue) //getting repositories from GitHub
+					.doOnNext(list -> {
+						clearCacheAndLocalDB();
+					})
 					.flatMap(Observable::fromIterable)
 					.doOnNext(repo ->  //for each repository, get count of branches asking for them paginated by 1 and checking header response
 							remoteBranchDataSource.countBranches(true, owner, repo.getName(), accessTokenString, accessTokenTypeString, "1")
@@ -216,19 +213,23 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 										   }
 								);
 					})
-					.flatMap(Observable::fromArray).doOnNext(repo -> {
-						repoCaches.add(repo); //adding repositories to cache
-						localRepoDataSource.addRepo(repo); //adding repositories to local DB
+					.doOnNext(repo -> {
+						addReposToCacheAndLocalDB(repo);
 					})
 					.toList().toObservable();
 
 	}
 
-	private void clearCacheAndLocalDB() {
+	public void clearCacheAndLocalDB() {
 		// Clear cache
 		repoCaches.clear();
 		// Clear data in local storage
 		new deleteAllReposAsyncTask(localRepoDataSource).execute();
+	}
+
+	public void addReposToCacheAndLocalDB(Repo repo) {
+		repoCaches.add(repo); //adding repositories to cache
+		localRepoDataSource.addRepo(repo); //adding repositories to local DB
 	}
 
 	/**
