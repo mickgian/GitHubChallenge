@@ -1,8 +1,6 @@
 package link.mgiannone.githubchallenge.ui.login;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
@@ -18,7 +16,6 @@ import link.mgiannone.githubchallenge.ui.base.BaseActivity;
 public class LoginActivity extends BaseActivity implements LoginContract.View{
 
 	String owner = "";
-	private  SharedPreferences prefs;
 
 	@BindView(R.id.loginButton)
 	Button loginButton;
@@ -77,8 +74,7 @@ public class LoginActivity extends BaseActivity implements LoginContract.View{
 	private void gitHubLogin() {
 
 		//saving owner to be recovered after server response
-		prefs = this.getSharedPreferences("temp_owner", Context.MODE_PRIVATE);
-		prefs.edit().putString("tempOwner", owner).apply();
+		presenter.setCurrentTempOwner(owner);
 
 		Intent intent = new Intent(
 				Intent.ACTION_VIEW,

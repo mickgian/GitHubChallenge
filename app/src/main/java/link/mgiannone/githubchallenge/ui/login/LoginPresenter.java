@@ -13,7 +13,7 @@ public class LoginPresenter implements LoginContract.Presenter, LifecycleObserve
 	private GitHubChallengeRepository repository;
 
 	@Inject
-	public LoginPresenter(GitHubChallengeRepository repository, LoginContract.View view) {
+	public LoginPresenter(GitHubChallengeRepository repository) {
 		this.repository = repository;
 	}
 
@@ -28,5 +28,9 @@ public class LoginPresenter implements LoginContract.Presenter, LifecycleObserve
 	@Override
 	public void getAccessToken(String clientId, String clientSecret, String code) {
 		repository.recoverAccessToken(clientId, clientSecret, code);
+	}
+
+	public void setCurrentTempOwner(String owner) {
+		repository.setCurrentTempOwner(owner);
 	}
 }

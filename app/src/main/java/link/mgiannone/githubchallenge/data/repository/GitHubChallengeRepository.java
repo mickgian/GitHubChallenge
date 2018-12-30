@@ -1,8 +1,6 @@
 package link.mgiannone.githubchallenge.data.repository;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -16,8 +14,10 @@ import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 
 import link.mgiannone.githubchallenge.AndroidApplication;
+import link.mgiannone.githubchallenge.data.Config;
 import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.model.Repo;
+import link.mgiannone.githubchallenge.data.prefs.PreferencesHelper;
 import link.mgiannone.githubchallenge.ui.login.LoginActivity;
 import link.mgiannone.githubchallenge.ui.repositories.RepositoriesActivity;
 
@@ -26,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GitHubChallengeRepository implements RepoDataSource, BranchDataSource, AccessTokenDataSource, CommitDataSource {
+public class GitHubChallengeRepository implements RepoDataSource, BranchDataSource, AccessTokenDataSource, CommitDataSource, PreferencesHelper {
 
 	private static final String TAG = GitHubChallengeRepository.class.getSimpleName();
 
@@ -36,6 +36,8 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 	private BranchDataSource remoteBranchDataSource;
 	private AccessTokenDataSource remoteAccessTokenDataSource;
 	private CommitDataSource remoteCommitDataSource;
+
+	private PreferencesHelper preferencesHelper;
 
 
 	@VisibleForTesting
@@ -47,12 +49,14 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 									 @Remote RepoDataSource remoteRepoDataSource,
 									 @Remote BranchDataSource remoteBranchDataSource,
 									 @Remote CommitDataSource remoteCommitDataSource,
-									 @Remote AccessTokenDataSource remoteAccessTokenDataSource) {
+									 @Remote AccessTokenDataSource remoteAccessTokenDataSource,
+									 PreferencesHelper preferencesHelper) {
 		this.localRepoDataSource = localRepoDataSource;
 		this.remoteRepoDataSource = remoteRepoDataSource;
 		this.remoteBranchDataSource = remoteBranchDataSource;
 		this.remoteAccessTokenDataSource = remoteAccessTokenDataSource;
 		this.remoteCommitDataSource = remoteCommitDataSource;
+		this.preferencesHelper = preferencesHelper;
 
 		repoCaches = new ArrayList<>();
 	}
@@ -290,13 +294,15 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 					Log.d(TAG, "Token Access succesfully recovered");
 					accessToken = response.body();
 
-					SharedPreferences prefs = AndroidApplication.getAppContext().getSharedPreferences("access_token", Context.MODE_PRIVATE);
-					prefs.edit().putString("oauth.accesstoken", accessToken.getAccessToken()).apply();
-					prefs.edit().putString("oauth.tokentype", accessToken.getTokenType()).apply();
+					//setting access toekn to shared preferences
+					setAccessTokenString(accessToken.getAccessToken());
+					setAccessTokenType(accessToken.getTokenType());
 
 					//getting temp owner from shared prefrences
-					prefs = AndroidApplication.getAppContext().getSharedPreferences("temp_owner", Context.MODE_PRIVATE);
-					String owner = prefs.getString("tempOwner", "");
+					String owner = getCurrentTempOwner();
+					if(owner.equalsIgnoreCase("")){
+						owner = Config.DEFAULT_OWNER;
+					}
 
 					if(accessToken != null){
 						Intent intentLogin = new Intent();
@@ -315,6 +321,36 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 				}
 			});
 
+	}
+
+	@Override
+	public String getCurrentTempOwner() {
+		return preferencesHelper.getCurrentTempOwner();
+	}
+
+	@Override
+	public void setCurrentTempOwner(String tempOwner) {
+		preferencesHelper.setCurrentTempOwner(tempOwner);
+	}
+
+	@Override
+	public String getAccessTokenString() {
+		return preferencesHelper.getAccessTokenString();
+	}
+
+	@Override
+	public void setAccessTokenString(String accessTokenString) {
+		preferencesHelper.setAccessTokenString(accessTokenString);
+	}
+
+	@Override
+	public String getAccessTokenType() {
+		return preferencesHelper.getAccessTokenType();
+	}
+
+	@Override
+	public void setAccessTokenType(String accessTokenType) {
+		preferencesHelper.setAccessTokenType(accessTokenType);
 	}
 
 	private static class deleteAllReposAsyncTask extends AsyncTask<Void, Void, Void> {

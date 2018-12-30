@@ -8,6 +8,7 @@ import com.facebook.stetho.Stetho;
 import com.squareup.leakcanary.LeakCanary;
 
 import link.mgiannone.githubchallenge.data.DaggerGitHubChallengeRepositoryComponent;
+import link.mgiannone.githubchallenge.data.GitHubChallengePrefModule;
 import link.mgiannone.githubchallenge.data.GitHubChallengeRepositoryComponent;
 import timber.log.Timber;
 
@@ -38,6 +39,7 @@ public class AndroidApplication extends Application {
   private void initializeDependencies() {
     gitHubChallengeRepositoryComponent = DaggerGitHubChallengeRepositoryComponent.builder()
         .appModule(new AppModule(this))
+        .gitHubChallengePrefModule(new GitHubChallengePrefModule(this))
         .build();
   }
 

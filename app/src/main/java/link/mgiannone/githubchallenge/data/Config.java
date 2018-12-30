@@ -10,4 +10,6 @@ public class Config {
   public static final String CLIENT_ID = "e7af04f5d2eb498a131a";
   public static final String CLIENT_SECRET = "f5aa91af36d6f8edb576c42e6d185e77c829b983";
   public static final String REDIRECT_URI = "https://githubchallenge-1472f.firebaseapp.com/__/auth/handler";
+  public static final String PREF_NAME = "github_challenge_pref";
+  public static final String DEFAULT_OWNER = "mickgian";
 }

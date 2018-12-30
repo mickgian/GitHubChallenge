@@ -23,6 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import link.mgiannone.githubchallenge.R;
+import link.mgiannone.githubchallenge.data.Config;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.ui.base.BaseActivity;
 import link.mgiannone.githubchallenge.ui.login.LoginActivity;
@@ -65,7 +66,7 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		String className = getIntent().getStringExtra("Class");
 
 		if (className == null){
-			owner = "mickgian";  //when app starts for the first time show its own repository
+			owner = Config.DEFAULT_OWNER;
 		}else{
 			owner = getIntent().getStringExtra("owner");
 			presenter.checkRepoPerUser(owner); //starting first call

@@ -1,6 +1,5 @@
 package link.mgiannone.githubchallenge.ui.repositories;
 
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.VisibleForTesting;
@@ -17,7 +16,6 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
-import link.mgiannone.githubchallenge.AndroidApplication;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.data.repository.GitHubChallengeRepository;
 import link.mgiannone.githubchallenge.util.schedulers.RunOn;
@@ -44,7 +42,6 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	private Scheduler uiScheduler;
 
 	private CompositeDisposable disposeBag;
-	private SharedPreferences pref;
 
 	@Inject
 	public RepositoriesPresenter(GitHubChallengeRepository repository, RepositoriesContract.View view,
@@ -60,7 +57,6 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 		}
 
 		disposeBag = new CompositeDisposable();
-		pref = AndroidApplication.getAppContext().getSharedPreferences("access_token", 0); // 0 - for private mode
 	}
 
 	@Override @OnLifecycleEvent(Lifecycle.Event.ON_RESUME) public void onAttach() {
@@ -76,9 +72,9 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	@Override
 	public void checkRepoPerUser(String owner) {
 
-		//recovering access token data from Shared Preferences
-		String accessTokenString = pref.getString("oauth.accesstoken", "");
-		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
+		//recovering access token data from Shared Preferences;
+		String accessTokenString = repository.getAccessTokenString();
+		String accessTokenTypeString = repository.getAccessTokenType();
 
 		//Asking for a list of repositories with 1 repository per page.
 		//This let us know how many repositories we found and also to deal with error response code
@@ -150,8 +146,9 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 
 		view.showProgressBarIfHidden();
 
-		String accessTokenString = pref.getString("oauth.accesstoken", "");
-		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
+		//recovering access token data from Shared Preferences
+		String accessTokenString = repository.getAccessTokenString();
+		String accessTokenTypeString = repository.getAccessTokenType();
 
 		// Load new one and populate it into view
 		Disposable disposable = repository.loadRemoteRepos(owner, accessTokenString, accessTokenTypeString, "100")
@@ -183,8 +180,8 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 		view.clearRepos();
 
 		//recovering access token data from Shared Preferences
-		String accessTokenString = pref.getString("oauth.accesstoken", "");
-		String accessTokenTypeString = pref.getString("oauth.tokentype", "");
+		String accessTokenString = repository.getAccessTokenString();
+		String accessTokenTypeString = repository.getAccessTokenType();
 
 		if(onlineRequired){
 			Disposable disposable = repository.loadRemoteRepos(owner, accessTokenString, accessTokenTypeString, "100")
