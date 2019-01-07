@@ -81,6 +81,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.retrofitVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.okhttpVersion"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$rootProject.okhttpVersion"
 
     // Timber
     implementation "com.jakewharton.timber:timber:$rootProject.timberVersion"
@@ -104,6 +105,7 @@ dependencies {
     // Local Unit Test
     testImplementation "junit:junit:$rootProject.junitVersion"
     testImplementation "org.mockito:mockito-core:$rootProject.mockitoVersion"
+    testImplementation "org.mockito:mockito-inline:$rootProject.mockitoVersion"
     testImplementation "org.hamcrest:hamcrest-all:$rootProject.hamcrestVersion"
 
     // Developer tools

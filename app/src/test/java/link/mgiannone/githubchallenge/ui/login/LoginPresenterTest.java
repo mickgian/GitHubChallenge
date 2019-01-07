@@ -28,15 +28,13 @@ public class LoginPresenterTest {
 	// region helper
 	@Mock
 	private GitHubChallengeRepository repository;
-	@Mock
-	private LoginContract.View viewMock;
 	// endregion helper fields
 
 	LoginPresenter SUT;
 
 	@Before
 	public void setUp() throws Exception {
-		SUT = new LoginPresenter(repository, viewMock);
+		SUT = new LoginPresenter(repository);
 	}
 
 	@Test

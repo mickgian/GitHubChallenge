@@ -32,7 +32,7 @@ public class RepoRemoteDataSource implements RepoDataSource {
 
 	@Override
 	public Observable<List<Repo>> loadLocalRepos(String owner, String accessTokenString, String accessTokenTypeString, String perPageValue) {
-		return null;
+		throw new UnsupportedOperationException("Unsupported operation");
 	}
 
 	@Override
