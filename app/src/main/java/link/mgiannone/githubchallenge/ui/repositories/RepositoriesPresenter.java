@@ -91,11 +91,9 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 		String link = response.headers().get("Link");
 		String message = response.message();
 
-		//checking GitHub API requests limit
+		//For debugging: checking GitHub API requests limit
 		String limit = response.headers().get("X-RateLimit-Limit");
-		Log.d(TAG, "Limit requests: " + limit);
 		String limitRemaining = response.headers().get("X-RateLimit-Remaining");
-		Log.d(TAG, "Limit requests remaining: " + limitRemaining);
 
 		//getting http response code
 		int code = response.code();
@@ -138,7 +136,6 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 	}
 
 	private void handleHeaderError(Throwable error) {
-		Log.e(TAG, error.getMessage(), error);
 		view.showErrorMessage(error.getLocalizedMessage());
 	}
 
@@ -223,15 +220,5 @@ public class RepositoriesPresenter implements RepositoriesContract.Presenter, Li
 			view.showErrorMessage(error.getLocalizedMessage());
 		}
 	}
-
-	@Override public void getRepo(int repoId) {
-		Disposable disposable = repository.getRepo(repoId)
-				.filter(repo -> repo != null)
-				.subscribeOn(ioScheduler)
-				.observeOn(uiScheduler)
-				.subscribe(repo -> view.showRepositoryDetail(repo));
-		disposeBag.add(disposable);
-	}
-
 
 }

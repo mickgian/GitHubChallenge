@@ -119,8 +119,6 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		repoRecyclerView.setLayoutManager(layoutManager);
 		repoRecyclerView.setAdapter(adapter);
 		repoRecyclerView.setItemAnimator(new DefaultItemAnimator());
-		adapter.setOnItemClickListener(
-				(view, position) -> presenter.getRepo(adapter.getItem(position).getId()));
 
 		// Refresh layout
 		refreshLayout.setOnRefreshListener(() -> presenter.presenterLoadRepos(true, owner));
@@ -161,17 +159,9 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 		loadReposProgressBar.setVisibility(View.GONE);
 	}
 
-	@Override public void showRepositoryDetail(Repo repo) {
-//		Intent intent = new Intent(RepositoriesActivity.this, RepositoryDetail.class);
-//		startActivity(intent);
-	}
-
 	@Override public void clearRepos() {
 		adapter.clearData();
 	}
-
-
-
 
 	@Override public void showNoDataMessage() {
 		showNotification(getString(R.string.msg_no_data));

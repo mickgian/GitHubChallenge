@@ -15,8 +15,6 @@ public interface RepositoriesContract {
 
 		void showErrorMessage(String error);
 
-		void showRepositoryDetail(Repo repo);
-
 		void stopLoadingIndicator();
 
 		void showEmptySearchResult();
@@ -32,8 +30,6 @@ public interface RepositoriesContract {
 
 	interface Presenter extends BasePresenter<View> {
 		void presenterLoadRepos(boolean onlineRequired, String owner);
-
-		void getRepo(int repoId);
 
 		void searchRepo(String repoTitle);
 

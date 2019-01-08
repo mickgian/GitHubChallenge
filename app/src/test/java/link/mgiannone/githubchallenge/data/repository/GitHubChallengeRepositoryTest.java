@@ -1,11 +1,9 @@
 package link.mgiannone.githubchallenge.data.repository;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -13,22 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.functions.Function;
 import io.reactivex.observers.TestObserver;
-import io.reactivex.plugins.RxJavaPlugins;
-import io.reactivex.schedulers.Schedulers;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.data.prefs.PreferencesHelper;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -62,14 +53,14 @@ public class GitHubChallengeRepositoryTest {
 
 	@Mock private PreferencesHelper preferencesHelperMock;
 
-	private GitHubChallengeRepository repository;
+	private GitHubChallengeRepository SUT;
 
 	private TestObserver<List<Repo>> reposTestObserver;
 
 	@Before
 	public void setup() {
 
-		repository = new GitHubChallengeRepository(
+		SUT = new GitHubChallengeRepository(
 				localReposDataSourceMock,
 				remoteReposDataSourceMock,
 				remoteBranchDataSourceMock,
@@ -83,10 +74,10 @@ public class GitHubChallengeRepositoryTest {
 	@Test
 	public void repository_loadRepos_returnCacheIfItIsAvailableExpected() {
 		// Given
-		repository.repoCaches.addAll(repositories);
+		SUT.repoCaches.addAll(repositories);
 
 		// When
-		repository.loadLocalRepos(
+		SUT.loadLocalRepos(
 				"owner",
 				"access_token_string",
 				"access_token_type",
@@ -102,15 +93,15 @@ public class GitHubChallengeRepositoryTest {
 
 	@Test public void repository_loadRepos_returnFromLocalOrRemoteExpected() {
 		// Given
-		doReturn(Observable.just(repositories)).when(remoteReposDataSourceMock).loadRemoteRepos(
+		given(remoteReposDataSourceMock.loadRemoteRepos(
 				OWNER,
 				ACCESS_TOKEN_STRING,
 				ACCESS_TOKEN_TYPE,
 				PER_PAGE_VALUE
-		);
+		)).willReturn(Observable.just(repositories));
 
 		// When
-		repository.loadRemoteRepos(
+		SUT.loadRemoteRepos(
 				OWNER,
 				ACCESS_TOKEN_STRING,
 				ACCESS_TOKEN_TYPE,
@@ -138,11 +129,11 @@ public class GitHubChallengeRepositoryTest {
 		repo1.setId(1);
 		repo2.setId(2);
 		repo3.setId(3);
-		repository.repoCaches.addAll(repositories);
+		SUT.repoCaches.addAll(repositories);
 		TestObserver<Repo> subscriber = new TestObserver<>();
 
 		// When
-		repository.getRepo(1).subscribe(subscriber);
+		SUT.getRepo(1).subscribe(subscriber);
 
 		// Then
 		// No interaction with local storage or remote source
@@ -154,36 +145,36 @@ public class GitHubChallengeRepositoryTest {
 
 	@Test public void repository_addRepos_addReposToCacheAndLocalDBExpected() {
 		// When
-		repository.addReposToCacheAndLocalDB(repo1);
+		SUT.addReposToCacheAndLocalDB(repo1);
 
 		// Then
-		assertThat(repository.repoCaches, is(singleRepo));
+		assertThat(SUT.repoCaches, is(singleRepo));
 		then(localReposDataSourceMock).should().addRepo(repo1);
 	}
 
 	@Test public void repository_clearData_clearCachesAndLocalDataExpected() {
 		// Given
-		repository.repoCaches.addAll(repositories);
+		SUT.repoCaches.addAll(repositories);
 
 		// When
-		repository.clearReposData();
+		SUT.clearReposData();
 
 		// Then
-		assertThat(repository.repoCaches, empty());
+		assertThat(SUT.repoCaches, empty());
 		then(localReposDataSourceMock).should().clearReposData();
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void repository_addRepo_throwExceptionExpected() {
-		repository.addRepo(repo1);
+		SUT.addRepo(repo1);
 	}
 
 	@Test
 	public void repository_getCurrentTempOwner_tempOwnerExpected() throws Exception{
 
-		when(repository.getCurrentTempOwner()).thenReturn(OWNER);
+		when(SUT.getCurrentTempOwner()).thenReturn(OWNER);
 
-		String result = repository.getCurrentTempOwner();
+		String result = SUT.getCurrentTempOwner();
 
 		assertThat(result, is(OWNER));
 
@@ -192,9 +183,9 @@ public class GitHubChallengeRepositoryTest {
 	@Test
 	public void repository__getAccessTokenString_accessTokenStringExpected() throws Exception{
 
-		when(repository.getAccessTokenString()).thenReturn(ACCESS_TOKEN_STRING);
+		when(SUT.getAccessTokenString()).thenReturn(ACCESS_TOKEN_STRING);
 
-		String result = repository.getAccessTokenString();
+		String result = SUT.getAccessTokenString();
 
 		assertThat(result, is(ACCESS_TOKEN_STRING));
 
@@ -203,9 +194,9 @@ public class GitHubChallengeRepositoryTest {
 	@Test
 	public void repository_getAccessTokenType_accessTokenTypeExpected() throws Exception{
 
-		when(repository.getAccessTokenType()).thenReturn(ACCESS_TOKEN_TYPE);
+		when(SUT.getAccessTokenType()).thenReturn(ACCESS_TOKEN_TYPE);
 
-		String result = repository.getAccessTokenType();
+		String result = SUT.getAccessTokenType();
 
 		assertThat(result, is(ACCESS_TOKEN_TYPE));
 
