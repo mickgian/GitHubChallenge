@@ -291,14 +291,14 @@ public class GitHubChallengeRepository implements RepoDataSource, BranchDataSour
 			accessTokenCall.enqueue(new Callback<AccessToken>() {
 				@Override
 				public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
-					Log.d(TAG, "Token Access succesfully recovered");
+//					Log.d(TAG, "Token Access successfully recovered");
 					accessToken = response.body();
 
-					//setting access toekn to shared preferences
+					//setting access token to shared preferences
 					setAccessTokenString(accessToken.getAccessToken());
 					setAccessTokenType(accessToken.getTokenType());
 
-					//getting temp owner from shared prefrences
+					//getting temp owner from shared preferences
 					String owner = getCurrentTempOwner();
 					if(owner.equalsIgnoreCase("")){
 						owner = Config.DEFAULT_OWNER;

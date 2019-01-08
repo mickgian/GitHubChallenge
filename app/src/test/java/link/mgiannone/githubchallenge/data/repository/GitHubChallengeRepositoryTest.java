@@ -4,20 +4,29 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
+import link.mgiannone.githubchallenge.data.model.AccessToken;
 import link.mgiannone.githubchallenge.data.model.Repo;
 import link.mgiannone.githubchallenge.data.prefs.PreferencesHelper;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
@@ -202,7 +211,36 @@ public class GitHubChallengeRepositoryTest {
 
 	}
 
-
+//	@Test
+//	public void repository_recoverAccessToken_successExpected() {
+//		AccessToken accessToken = new AccessToken();
+//		String accessTokenString = "0123456789";
+//		String accessTokenType = "bearer";
+//		Call<AccessToken> mockedCall = Mockito.mock(Call.class);
+//
+//		given(remoteAccessTokenDataSourceMock.getToken(
+//				anyString(),
+//				anyString(),
+//				anyString()
+//		)).willReturn(mockedCall);
+//
+//		Mockito.doAnswer(new Answer() {
+//			@Override
+//			public Void answer(InvocationOnMock invocation) throws Throwable {
+//				Callback<AccessToken> callback = invocation.getArgument(0);
+//
+//				callback.onResponse(mockedCall, Response.success(accessToken));
+//				// or callback.onResponse(mockedCall, Response.error(404. ...);
+//				// or callback.onFailure(mockedCall, new IOException());
+//
+//				return null;
+//			}
+//		}).when(mockedCall).enqueue(any(Callback.class));
+//
+//		// inject mocked ApiInterface to your presenter
+//		// and then mock view and verify calls (and eventually use ArgumentCaptor to access call parameters)
+//		then(preferencesHelperMock).should().setAccessTokenString(accessTokenString);
+//	}
 
 }
 

@@ -1,8 +1,0 @@
-[
-  {
-    "Status": "200 OK",
-    "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "57",
-    "Link": "<https://api.github.com/user/4228262/repos?access_token=&token_type=&per_page=1&page=2>; rel=\"next\", <https://api.github.com/user/4228262/repos?access_token=&token_type=&per_page=1&page=2>; rel=\"last\""
-  }
-]
