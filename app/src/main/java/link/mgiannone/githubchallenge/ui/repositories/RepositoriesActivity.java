@@ -67,9 +67,13 @@ public class RepositoriesActivity extends BaseActivity implements RepositoriesCo
 
 		if (className == null){
 			owner = Config.DEFAULT_OWNER;
-		}else{
+			getIntent().putExtra("Class", "RepositoryActivity");
+		}else if (className.equalsIgnoreCase("GitHubChallengeRepository")){
 			owner = getIntent().getStringExtra("owner");
 			presenter.checkRepoPerUser(owner); //starting first call
+			getIntent().putExtra("Class", "RepositoryActivity");
+		}else if (className.equalsIgnoreCase("RepositoryActivity")){
+			presenter.presenterLoadRepos(false, owner);
 		}
 	}
 
