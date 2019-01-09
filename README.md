@@ -48,4 +48,4 @@ It uses Dagger2, RXJava2, Retrofit, ButterKnife among the most important librari
 	- For user with lot of repositories loading data is a bit slow. This could be probably improved implementing the Paging library 
     for Android (https://developer.android.com/topic/libraries/architecture/paging/) and using an RXPagedListBuilder 
     (https://developer.android.com/reference/androidx/paging/RxPagedListBuilder).
-	- TESTS have not been implemented :(	
+		
